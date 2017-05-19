@@ -1,6 +1,7 @@
 package com.atguigu.mobileplayer0224.pager;
 
 import android.graphics.Color;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
@@ -20,6 +21,7 @@ public class NetAudioPager extends BaseFragment {
     //重写视图
     @Override
     public View initView() {
+        Log.e("TAG","NetAudioPager-initView");
         textView = new TextView(context);
         textView.setTextSize(30);
         textView.setGravity(Gravity.CENTER);
@@ -30,6 +32,7 @@ public class NetAudioPager extends BaseFragment {
     @Override
     public void initData() {
         super.initData();
+        Log.e("TAG","NetAudioPager-initData");
         textView.setText("网络音乐的内容");
     }
 }

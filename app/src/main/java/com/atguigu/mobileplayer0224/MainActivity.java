@@ -1,9 +1,9 @@
 package com.atguigu.mobileplayer0224;
 
-import android.support.v4.app.FragmentManager;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.widget.RadioGroup;
 
 import com.atguigu.mobileplayer0224.fragment.BaseFragment;
@@ -19,6 +19,10 @@ public class MainActivity extends AppCompatActivity {
     private RadioGroup rg_main;
     private ArrayList<BaseFragment> fragments;
     private int position;
+    /**
+     * 缓存当前显示的Fragment
+     */
+    private Fragment tempFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,22 +65,43 @@ public class MainActivity extends AppCompatActivity {
                     position  = 3;
                     break;
             }
-            addFragment();
+            //根据位置得到对应的Fragment
+            BaseFragment currentFragment = fragments.get(position);//要显示的Fragment
+            addFragment(currentFragment);
 
 
         }
     }
 
-    private void addFragment() {
-        //根据位置得到对应的Fragment
-        BaseFragment baseFragment = fragments.get(position);
-        //1.得到FragmentNanager
-        FragmentManager fm = getSupportFragmentManager();
-        //2.开启事务
-        FragmentTransaction ft = fm.beginTransaction();
-        //3.添加
-        ft.replace(R.id.fl_content,baseFragment);
-        //4.提交
-        ft.commit();
+    private void addFragment(Fragment currentFragment) {
+        if(tempFragment != currentFragment){
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+
+            //判断是否添加过-没有添加
+            if(!currentFragment.isAdded()){
+                //把之前的隐藏
+                if(tempFragment != null){
+                    ft.hide(tempFragment);
+                }
+                //添加当前的
+                ft.add(R.id.fl_content,currentFragment);
+            }else{
+//       当前Fragment已经添加过
+                //把之前的隐藏
+                if(tempFragment != null){
+                    ft.hide(tempFragment);
+                }
+                //显示当前的
+                ft.show(currentFragment);
+
+            }
+
+            ft.commit();//提交事务
+            //把当前的缓存起来
+            tempFragment = currentFragment;
+
+        }
+
+
     }
 }
