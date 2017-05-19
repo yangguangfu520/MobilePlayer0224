@@ -16,7 +16,7 @@ import android.view.ViewGroup;
  */
 
 public abstract class BaseFragment extends Fragment {
-    private Context context;
+    public Context context;
 
     /**
      * 当Fragment被创建的时候回调
