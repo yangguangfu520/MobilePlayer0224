@@ -9,6 +9,14 @@
     </style>
 
 
+    <style name="myScreen"  parent="AppTheme">
+        <!-- Customize your theme here. -->
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowActionBar">false</item>
+    </style>
+
+
 
 
     <style name="myStyle" >
