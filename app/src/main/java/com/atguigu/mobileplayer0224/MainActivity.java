@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
         initFragment();
         //设置监听
         rg_main.setOnCheckedChangeListener(new MyOnCheckedChangeListener());
+        //默认选择本地视频
         rg_main.check(R.id.rb_local_video);
     }
 
