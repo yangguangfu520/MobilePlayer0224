@@ -3,13 +3,18 @@ package com.atguigu.mobileplayer0224.pager;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.atguigu.mobileplayer0224.R;
+import com.atguigu.mobileplayer0224.adapter.LocalVideoAdapter;
 import com.atguigu.mobileplayer0224.domain.MediaItem;
 import com.atguigu.mobileplayer0224.fragment.BaseFragment;
 
@@ -27,6 +32,7 @@ public class LocalVideoPager extends BaseFragment {
     private ListView lv;
     private TextView tv_nodata;
     private ArrayList<MediaItem> mediaItems;
+    private LocalVideoAdapter adapter;
 
     //重写视图-返回View
     @Override
@@ -35,6 +41,19 @@ public class LocalVideoPager extends BaseFragment {
         View  view = View.inflate(context, R.layout.fragment_local_video_pager,null);
         lv = (ListView) view.findViewById(R.id.lv);
         tv_nodata = (TextView) view.findViewById(R.id.tv_nodata);
+        //设置item的点击事件
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //得到点击item对应的对象
+//                MediaItem mediaItem = mediaItems.get(position);
+
+                MediaItem item = adapter.getItem(position);
+                Toast.makeText(context, ""+item.toString(), Toast.LENGTH_SHORT).show();
+
+
+            }
+        });
         return view;
     }
 
@@ -44,7 +63,27 @@ public class LocalVideoPager extends BaseFragment {
         Log.e("TAG","LocalVideoPager-initData");
         //加载本地所有的视频
         getData();
+
+
     }
+
+    private Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+
+            if(mediaItems != null && mediaItems.size() >0){
+                //有数据
+                tv_nodata.setVisibility(View.GONE);
+                //设置适配器
+                adapter = new LocalVideoAdapter(context,mediaItems);
+                lv.setAdapter(adapter);
+            }else{
+                //没有数据
+                tv_nodata.setVisibility(View.VISIBLE);
+            }
+        }
+    };
 
     /**
      * 得到数据
@@ -71,6 +110,9 @@ public class LocalVideoPager extends BaseFragment {
                         Log.e("TAG","name=="+name+",duration=="+duration+",data==="+data);
 
                         mediaItems.add(new MediaItem(name,duration,size,data));
+
+                        //使用handler
+                        handler.sendEmptyMessage(0);
                     }
 
                     cursor.close();
