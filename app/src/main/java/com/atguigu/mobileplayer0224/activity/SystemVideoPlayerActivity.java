@@ -11,6 +11,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -31,9 +33,12 @@ import java.util.Date;
 public class SystemVideoPlayerActivity extends AppCompatActivity implements View.OnClickListener {
     //视频进度更新
     private static final int PROGRESS = 0;
+    //隐藏控制面板
+    private static final int HIDE_MEDIACONTROLLER = 1;
     private VideoView vv;
     private Uri uri;
-    private ArrayList<MediaItem> mediaItems;;
+    private ArrayList<MediaItem> mediaItems;
+    ;
 
     private LinearLayout llTop;
     private TextView tvName;
@@ -57,6 +62,8 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
      * 视频列表的位置
      */
     private int position;
+    //手势识别器
+    private GestureDetector detector;
 
     /**
      * Find the Views in the layout<br />
@@ -66,31 +73,31 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
      */
     private void findViews() {
         setContentView(R.layout.activity_system_video_player);
-        llTop = (LinearLayout)findViewById( R.id.ll_top );
-        tvName = (TextView)findViewById( R.id.tv_name );
-        ivBattery = (ImageView)findViewById( R.id.iv_battery );
-        tvSystemTime = (TextView)findViewById( R.id.tv_system_time );
-        btnVoice = (Button)findViewById( R.id.btn_voice );
-        seekbarVoice = (SeekBar)findViewById( R.id.seekbar_voice );
-        btnSwitchPlayer = (Button)findViewById( R.id.btn_switch_player );
-        llBottom = (LinearLayout)findViewById( R.id.ll_bottom );
-        tvCurrentTime = (TextView)findViewById( R.id.tv_current_time );
-        seekbarVideo = (SeekBar)findViewById( R.id.seekbar_video );
-        tvDuration = (TextView)findViewById( R.id.tv_duration );
-        btnExit = (Button)findViewById( R.id.btn_exit );
-        btnPre = (Button)findViewById( R.id.btn_pre );
-        btnStartPause = (Button)findViewById( R.id.btn_start_pause );
-        btnNext = (Button)findViewById( R.id.btn_next );
-        btnSwitchScreen = (Button)findViewById( R.id.btn_switch_screen );
-        vv = (VideoView)findViewById(R.id.vv);
+        llTop = (LinearLayout) findViewById(R.id.ll_top);
+        tvName = (TextView) findViewById(R.id.tv_name);
+        ivBattery = (ImageView) findViewById(R.id.iv_battery);
+        tvSystemTime = (TextView) findViewById(R.id.tv_system_time);
+        btnVoice = (Button) findViewById(R.id.btn_voice);
+        seekbarVoice = (SeekBar) findViewById(R.id.seekbar_voice);
+        btnSwitchPlayer = (Button) findViewById(R.id.btn_switch_player);
+        llBottom = (LinearLayout) findViewById(R.id.ll_bottom);
+        tvCurrentTime = (TextView) findViewById(R.id.tv_current_time);
+        seekbarVideo = (SeekBar) findViewById(R.id.seekbar_video);
+        tvDuration = (TextView) findViewById(R.id.tv_duration);
+        btnExit = (Button) findViewById(R.id.btn_exit);
+        btnPre = (Button) findViewById(R.id.btn_pre);
+        btnStartPause = (Button) findViewById(R.id.btn_start_pause);
+        btnNext = (Button) findViewById(R.id.btn_next);
+        btnSwitchScreen = (Button) findViewById(R.id.btn_switch_screen);
+        vv = (VideoView) findViewById(R.id.vv);
 
-        btnVoice.setOnClickListener( this );
-        btnSwitchPlayer.setOnClickListener( this );
-        btnExit.setOnClickListener( this );
-        btnPre.setOnClickListener( this );
-        btnStartPause.setOnClickListener( this );
-        btnNext.setOnClickListener( this );
-        btnSwitchScreen.setOnClickListener( this );
+        btnVoice.setOnClickListener(this);
+        btnSwitchPlayer.setOnClickListener(this);
+        btnExit.setOnClickListener(this);
+        btnPre.setOnClickListener(this);
+        btnStartPause.setOnClickListener(this);
+        btnNext.setOnClickListener(this);
+        btnSwitchScreen.setOnClickListener(this);
     }
 
     /**
@@ -101,42 +108,49 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
      */
     @Override
     public void onClick(View v) {
-        if ( v == btnVoice ) {
+        if (v == btnVoice) {
             // Handle clicks for btnVoice
-        } else if ( v == btnSwitchPlayer ) {
+        } else if (v == btnSwitchPlayer) {
             // Handle clicks for btnSwitchPlayer
-        } else if ( v == btnExit ) {
+        } else if (v == btnExit) {
             finish();
             // Handle clicks for btnExit
-        } else if ( v == btnPre ) {
+        } else if (v == btnPre) {
             setPreVideo();
             // Handle clicks for btnPre
-        } else if ( v == btnStartPause ) {
-            if(vv.isPlaying()){
-                //暂停
-                vv.pause();
-                //按钮状态-播放
-                btnStartPause.setBackgroundResource(R.drawable.btn_start_selector);
-            }else {
-                //播放
-                vv.start();
-                //按钮状态-暂停
-                btnStartPause.setBackgroundResource(R.drawable.btn_pause_selector);
-            }
+        } else if (v == btnStartPause) {
+            setStartOrPause();
             // Handle clicks for btnStartPause
-        } else if ( v == btnNext ) {
+        } else if (v == btnNext) {
             setNextVideo();
             // Handle clicks for btnNext
-        } else if ( v == btnSwitchScreen ) {
+        } else if (v == btnSwitchScreen) {
             // Handle clicks for btnSwitchScreen
+        }
+
+        handler.removeMessages(HIDE_MEDIACONTROLLER);
+        handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER,4000);
+    }
+
+    private void setStartOrPause() {
+        if (vv.isPlaying()) {
+            //暂停
+            vv.pause();
+            //按钮状态-播放
+            btnStartPause.setBackgroundResource(R.drawable.btn_start_selector);
+        } else {
+            //播放
+            vv.start();
+            //按钮状态-暂停
+            btnStartPause.setBackgroundResource(R.drawable.btn_pause_selector);
         }
     }
 
-    private Handler handler = new Handler(){
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            switch (msg.what){
+            switch (msg.what) {
                 case PROGRESS:
                     //得到当前进度
                     int currentPosition = vv.getCurrentPosition();
@@ -150,8 +164,11 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
                     tvSystemTime.setText(getSystemTime());
 
                     //循环发消息
-                    sendEmptyMessageDelayed(PROGRESS,1000);
+                    sendEmptyMessageDelayed(PROGRESS, 1000);
 
+                    break;
+                case HIDE_MEDIACONTROLLER://隐藏控制面板
+                    hideMediaController();
                     break;
             }
         }
@@ -159,6 +176,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
     /**
      * 得到系统时间
+     *
      * @return
      */
     private String getSystemTime() {
@@ -183,19 +201,17 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 //        vv.setMediaController(new MediaController(this));
 
 
-
-
     }
 
     private void setData() {
 
-        if(mediaItems != null && mediaItems.size() >0){
+        if (mediaItems != null && mediaItems.size() > 0) {
 
             MediaItem mediaItem = mediaItems.get(position);
             tvName.setText(mediaItem.getName());
             vv.setVideoPath(mediaItem.getData());
 
-        }else if(uri != null){
+        } else if (uri != null) {
             //设置播放地址
             vv.setVideoURI(uri);
         }
@@ -207,8 +223,8 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     private void getData() {
         //得到播放地址
         uri = getIntent().getData();
-        mediaItems  = (ArrayList<MediaItem>) getIntent().getSerializableExtra("videolist");
-        position = getIntent().getIntExtra("position",0);
+        mediaItems = (ArrayList<MediaItem>) getIntent().getSerializableExtra("videolist");
+        position = getIntent().getIntExtra("position", 0);
 
     }
 
@@ -217,39 +233,96 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
         //注册监听电量变化广播
         receiver = new MyBroadCastReceiver();
-        IntentFilter intentFilter  = new IntentFilter();
+        IntentFilter intentFilter = new IntentFilter();
         //监听电量变化
         intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
-        registerReceiver(receiver,intentFilter);
+        registerReceiver(receiver, intentFilter);
+
+
+        //实例化手势识别器
+        detector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public void onLongPress(MotionEvent e) {
+//                Toast.makeText(SystemVideoPlayerActivity.this, "长按了", Toast.LENGTH_SHORT).show();
+                setStartOrPause();
+                super.onLongPress(e);
+            }
+
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                Toast.makeText(SystemVideoPlayerActivity.this, "双击了", Toast.LENGTH_SHORT).show();
+                return super.onDoubleTap(e);
+            }
+
+            @Override
+            public boolean onSingleTapConfirmed(MotionEvent e) {
+               // Toast.makeText(SystemVideoPlayerActivity.this, "单击了", Toast.LENGTH_SHORT).show();
+                if(isShowMediaController){
+                    hideMediaController();
+                    handler.removeMessages(HIDE_MEDIACONTROLLER);
+                }else {
+                    showMediaController();
+                    handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER,4000);
+                }
+                return super.onSingleTapConfirmed(e);
+            }
+        });
     }
 
-    class MyBroadCastReceiver extends BroadcastReceiver{
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        //把事件交给手势识别器解析
+        detector.onTouchEvent(event);
+        return super.onTouchEvent(event);
+    }
+
+    /**
+     * 是否显示控制面板
+     */
+    private  boolean isShowMediaController = false;
+    /**
+     * 隐藏控制面板
+     */
+    private void  hideMediaController(){
+        llBottom.setVisibility(View.INVISIBLE);
+        llTop.setVisibility(View.GONE);
+        isShowMediaController = false;
+    }
+
+    public void showMediaController(){
+        llBottom.setVisibility(View.VISIBLE);
+        llTop.setVisibility(View.VISIBLE);
+        isShowMediaController = true;
+    }
+
+
+    class MyBroadCastReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
             int level = intent.getIntExtra("level", 0);//主线程
-            Log.e("TAG","level=="+level);
+            Log.e("TAG", "level==" + level);
             setBatteryView(level);
 
         }
     }
 
     private void setBatteryView(int level) {
-        if(level <=0){
+        if (level <= 0) {
             ivBattery.setImageResource(R.drawable.ic_battery_0);
-        }else if(level <= 10){
+        } else if (level <= 10) {
             ivBattery.setImageResource(R.drawable.ic_battery_10);
-        }else if(level <=20){
+        } else if (level <= 20) {
             ivBattery.setImageResource(R.drawable.ic_battery_20);
-        }else if(level <=40){
+        } else if (level <= 40) {
             ivBattery.setImageResource(R.drawable.ic_battery_40);
-        }else if(level <=60){
+        } else if (level <= 60) {
             ivBattery.setImageResource(R.drawable.ic_battery_60);
-        }else if(level <=80){
+        } else if (level <= 80) {
             ivBattery.setImageResource(R.drawable.ic_battery_80);
-        }else if(level <=100){
+        } else if (level <= 100) {
             ivBattery.setImageResource(R.drawable.ic_battery_100);
-        }else {
+        } else {
             ivBattery.setImageResource(R.drawable.ic_battery_100);
         }
     }
@@ -270,6 +343,9 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
                 //发消息开始更新播放进度
                 handler.sendEmptyMessage(PROGRESS);
+
+                //默认隐藏
+                hideMediaController();
             }
         });
 
@@ -301,7 +377,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
              */
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if(fromUser){
+                if (fromUser) {
                     vv.seekTo(progress);
                 }
 
@@ -309,19 +385,20 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
+                handler.removeMessages(HIDE_MEDIACONTROLLER);
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
 
+                handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER,4000);
             }
         });
     }
 
     private void setPreVideo() {
         position--;
-        if(position > 0){
+        if (position > 0) {
             //还是在列表范围内容
             MediaItem mediaItem = mediaItems.get(position);
             vv.setVideoPath(mediaItem.getData());
@@ -337,8 +414,8 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
     private void setNextVideo() {
         position++;
-        if(position < mediaItems.size()){
-           //还是在列表范围内容
+        if (position < mediaItems.size()) {
+            //还是在列表范围内容
             MediaItem mediaItem = mediaItems.get(position);
             vv.setVideoPath(mediaItem.getData());
             tvName.setText(mediaItem.getName());
@@ -347,8 +424,8 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
             setButtonStatus();
 
 
-        }else{
-            Toast.makeText(this,"退出播放器",Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "退出播放器", Toast.LENGTH_SHORT).show();
             finish();
 
 
@@ -357,21 +434,21 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     }
 
     private void setButtonStatus() {
-        if(mediaItems != null && mediaItems.size() >0){
+        if (mediaItems != null && mediaItems.size() > 0) {
             //有视频播放
             setEnable(true);
 
-            if(position ==0){
+            if (position == 0) {
                 btnPre.setBackgroundResource(R.drawable.btn_pre_gray);
                 btnPre.setEnabled(false);
             }
 
-            if(position ==mediaItems.size()-1){
+            if (position == mediaItems.size() - 1) {
                 btnNext.setBackgroundResource(R.drawable.btn_next_gray);
                 btnNext.setEnabled(false);
             }
 
-        }else if(uri != null){
+        } else if (uri != null) {
             //上一个和下一个不可用点击
             setEnable(false);
         }
@@ -379,14 +456,15 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
     /**
      * 设置按钮是否可以点击
+     *
      * @param b
      */
     private void setEnable(boolean b) {
-        if( b){
+        if (b) {
             //上一个和下一个都可以点击
             btnPre.setBackgroundResource(R.drawable.btn_pre_selector);
             btnNext.setBackgroundResource(R.drawable.btn_next_selector);
-        }else {
+        } else {
             //上一个和下一个灰色，并且不可用点击
             btnPre.setBackgroundResource(R.drawable.btn_pre_gray);
             btnNext.setBackgroundResource(R.drawable.btn_next_gray);
@@ -398,20 +476,19 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     @Override
     protected void onDestroy() {
 
-        if(handler != null){
+        if (handler != null) {
             //把所有消息移除
             handler.removeCallbacksAndMessages(null);
             handler = null;
         }
 
         //取消注册
-        if(receiver != null){
+        if (receiver != null) {
             unregisterReceiver(receiver);
             receiver = null;
         }
 
         super.onDestroy();
-
 
 
     }
