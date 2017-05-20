@@ -46,35 +46,35 @@
         </LinearLayout>
 
         <LinearLayout
-            android:gravity="center_vertical"
-            android:background="@drawable/bg_player_top_control"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/bg_player_top_control"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <Button
                 android:id="@+id/btn_voice"
-                android:background="@drawable/btn_voice_selector"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_voice_selector" />
 
             <SeekBar
-                android:minHeight="5dp"
-                android:maxHeight="5dp"
-                android:thumb="@drawable/progress_thumb"
-                android:max="100"
-                android:progress="20"
                 android:id="@+id/seekbar_voice"
-                android:layout_weight="1"
-                android:progressDrawable="@drawable/progress_horizontal"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:max="100"
+                android:maxHeight="5dp"
+                android:minHeight="5dp"
+                android:progress="20"
+                android:progressDrawable="@drawable/progress_horizontal"
+                android:thumb="@drawable/progress_thumb" />
 
             <Button
                 android:id="@+id/btn_switch_player"
-                android:background="@drawable/btn_switch_player_selector"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_switch_player_selector" />
 
         </LinearLayout>
 
@@ -86,6 +86,90 @@
         android:id="@+id/ll_bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"></LinearLayout>
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_player_bottom_seekbar"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_current_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="进度"
+                android:textColor="@android:color/white" />
+
+            <SeekBar
+                android:id="@+id/seekbar_video"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:max="100"
+                android:maxHeight="5dp"
+                android:minHeight="5dp"
+                android:progress="20"
+                android:progressDrawable="@drawable/progress_horizontal"
+                android:thumb="@drawable/progress_thumb" />
+
+            <TextView
+                android:id="@+id/tv_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="总时长"
+                android:textColor="@android:color/white" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_player_bottom_control"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+
+            <Button
+                android:id="@+id/btn_exit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_exit_selector" />
+
+            <Button
+                android:id="@+id/btn_pre"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_pre_selector" />
+
+
+            <Button
+                android:id="@+id/btn_start_pause"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_pause_selector" />
+
+
+            <Button
+                android:id="@+id/btn_next"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_next_selector" />
+
+
+            <Button
+                android:id="@+id/btn_switch_screen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_switch_screen_full_selector" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
 
 </RelativeLayout>
