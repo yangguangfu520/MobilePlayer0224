@@ -30,6 +30,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity {
             //底层准备播放完成的时候回调
             @Override
             public void onPrepared(MediaPlayer mp) {
+                //vv.seekTo(100);
                 vv.start();//开始播放
             }
         });
