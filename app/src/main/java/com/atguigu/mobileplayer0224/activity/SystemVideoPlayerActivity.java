@@ -88,6 +88,17 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         } else if ( v == btnPre ) {
             // Handle clicks for btnPre
         } else if ( v == btnStartPause ) {
+            if(vv.isPlaying()){
+                //暂停
+                vv.pause();
+                //按钮状态-播放
+                btnStartPause.setBackgroundResource(R.drawable.btn_start_selector);
+            }else {
+                //播放
+                vv.start();
+                //按钮状态-暂停
+                btnStartPause.setBackgroundResource(R.drawable.btn_pause_selector);
+            }
             // Handle clicks for btnStartPause
         } else if ( v == btnNext ) {
             // Handle clicks for btnNext
@@ -106,14 +117,27 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
         //得到播放地址
         uri = getIntent().getData();
+        setListener();
+        //设置播放地址
+        vv.setVideoURI(uri);
+
+        //设置控制面板
+//        vv.setMediaController(new MediaController(this));
 
 
 
+
+    }
+
+    private void setListener() {
         //设置播放器三个监听：播放准备好的监听，播放完成的监听，播放出错的监听
         vv.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             //底层准备播放完成的时候回调
             @Override
             public void onPrepared(MediaPlayer mp) {
+                //得到视频的总时长
+                int duration = vv.getDuration();
+                seekbarVideo.setMax(duration);
                 //vv.seekTo(100);
                 vv.start();//开始播放
             }
@@ -136,14 +160,31 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
             }
         });
 
-        //设置播放地址
-        vv.setVideoURI(uri);
+        //设置Seekbar状态改变的监听
+        seekbarVideo.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            /**
+             *
+             * @param seekBar
+             * @param progress
+             * @param fromUser true:用户拖动改变的，false:系统更新改变的
+             */
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if(fromUser){
+                    vv.seekTo(progress);
+                }
 
-        //设置控制面板
-//        vv.setMediaController(new MediaController(this));
+            }
 
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
 
+            }
 
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
 
+            }
+        });
     }
 }
