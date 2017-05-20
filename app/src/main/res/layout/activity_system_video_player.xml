@@ -8,7 +8,7 @@
     android:gravity="center"
     tools:context="com.atguigu.mobileplayer0224.activity.SystemVideoPlayerActivity">
 
-    <VideoView
+    <com.atguigu.mobileplayer0224.view.VideoView
         android:id="@+id/vv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
