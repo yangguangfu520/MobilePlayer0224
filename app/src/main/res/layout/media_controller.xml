@@ -101,7 +101,7 @@
                 android:id="@+id/tv_current_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="进度"
+                android:text="00:00"
                 android:textColor="@android:color/white" />
 
             <SeekBar
@@ -120,7 +120,7 @@
                 android:id="@+id/tv_duration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="总时长"
+                android:text="10:00"
                 android:textColor="@android:color/white" />
 
         </LinearLayout>
