@@ -1,5 +1,7 @@
 package com.atguigu.mobileplayer0224.domain;
 
+import java.io.Serializable;
+
 /**
  * 作者：杨光福 on 2017/5/19 15:38
  * QQ：541433511
@@ -7,7 +9,7 @@ package com.atguigu.mobileplayer0224.domain;
  * 作用：
  */
 
-public class MediaItem {
+public class MediaItem implements Serializable{
     private String name;
     private long duration;
     private long size;

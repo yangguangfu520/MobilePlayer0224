@@ -21,9 +21,11 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.atguigu.mobileplayer0224.R;
+import com.atguigu.mobileplayer0224.domain.MediaItem;
 import com.atguigu.mobileplayer0224.utils.Utils;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class SystemVideoPlayerActivity extends AppCompatActivity implements View.OnClickListener {
@@ -31,6 +33,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     private static final int PROGRESS = 0;
     private VideoView vv;
     private Uri uri;
+    private ArrayList<MediaItem> mediaItems;;
 
     private LinearLayout llTop;
     private TextView tvName;
@@ -50,6 +53,10 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     private Button btnSwitchScreen;
     private Utils utils;
     private MyBroadCastReceiver receiver;
+    /**
+     * 视频列表的位置
+     */
+    private int position;
 
     /**
      * Find the Views in the layout<br />
@@ -164,19 +171,39 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         initData();
 
         findViews();
+        getData();
 
-
-        //得到播放地址
-        uri = getIntent().getData();
         setListener();
-        //设置播放地址
-        vv.setVideoURI(uri);
+        setData();
 
         //设置控制面板
 //        vv.setMediaController(new MediaController(this));
 
 
 
+
+    }
+
+    private void setData() {
+
+        if(mediaItems != null && mediaItems.size() >0){
+
+            MediaItem mediaItem = mediaItems.get(position);
+            tvName.setText(mediaItem.getName());
+            vv.setVideoPath(mediaItem.getData());
+
+        }else if(uri != null){
+            //设置播放地址
+            vv.setVideoURI(uri);
+        }
+
+    }
+
+    private void getData() {
+        //得到播放地址
+        uri = getIntent().getData();
+        mediaItems  = (ArrayList<MediaItem>) getIntent().getSerializableExtra("videolist");
+        position = getIntent().getIntExtra("position",0);
 
     }
 
