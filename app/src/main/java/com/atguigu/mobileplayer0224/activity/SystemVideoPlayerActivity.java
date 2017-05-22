@@ -586,8 +586,12 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         vv.setOnErrorListener(new MediaPlayer.OnErrorListener() {
             @Override
             public boolean onError(MediaPlayer mp, int what, int extra) {
-                Toast.makeText(SystemVideoPlayerActivity.this, "播放出错了哦", Toast.LENGTH_SHORT).show();
-                return false;
+               // Toast.makeText(SystemVideoPlayerActivity.this, "播放出错了哦", Toast.LENGTH_SHORT).show();
+                //一进来播放就会报错-视频格式不支持 --- 跳转到万能播放器
+                startVitamioPlayer();
+                //播放过程中网络中断导致播放异常--重新播放-三次重试
+                //文件中间部分损坏或者文件不完整-把下载做好
+                return true;
             }
         });
 
@@ -670,6 +674,24 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 //                }
 //            });
 //        }
+    }
+
+    private void startVitamioPlayer() {
+        if(vv != null){
+            vv.stopPlayback();
+        }
+        Intent intent = new Intent(this, VitamioVideoPlayerActivity.class);
+        if(mediaItems != null && mediaItems.size() >0){
+            Bundle bunlder = new Bundle();
+            bunlder.putSerializable("videolist",mediaItems);
+            intent.putExtra("position",position);
+            //放入Bundler
+            intent.putExtras(bunlder);
+        }else if(uri != null){
+            intent.setData(uri);
+        }
+        startActivity(intent);
+        finish();//关闭系统播放器
     }
 
     /**

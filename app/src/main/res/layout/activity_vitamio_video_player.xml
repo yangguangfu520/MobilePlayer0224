@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_system_video_player"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:gravity="center"
+    tools:context="com.atguigu.mobileplayer0224.activity.SystemVideoPlayerActivity">
+
+    <com.atguigu.mobileplayer0224.view.VitamioVideoView
+        android:id="@+id/vv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true" />
+
+    <include layout="@layout/media_controller" />
+
+    <LinearLayout
+        android:id="@+id/ll_loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_player_loading_background"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/tv_loading_net_speed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="正在加载中....15kb/s"
+            android:textColor="#ffffff" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_buffering"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/tv_net_speed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="正在缓冲....15kb/s"
+            android:textColor="#ffffff" />
+    </LinearLayout>
+
+</RelativeLayout>
