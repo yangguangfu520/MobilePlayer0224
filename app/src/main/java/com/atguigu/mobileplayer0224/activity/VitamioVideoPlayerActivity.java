@@ -175,6 +175,7 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
 
         } else if (v == btnSwitchPlayer) {
             // Handle clicks for btnSwitchPlayer
+            switchPlayer();
         } else if (v == btnExit) {
             finish();
             // Handle clicks for btnExit
@@ -200,6 +201,20 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
 
         handler.removeMessages(HIDE_MEDIACONTROLLER);
         handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 4000);
+    }
+
+    private void switchPlayer() {
+        new AlertDialog.Builder(this)
+                .setTitle("提示")
+                .setMessage("如果当前为万能播放器播放，当播放有色块，播放质量不好，请切换到系统播放器播放")
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        startSystemPlayer();
+                    }
+                })
+                .setNegativeButton("取消", null)
+                .show();
     }
 
     private void updateVoice(boolean isMute) {
@@ -693,8 +708,22 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
                 .show();
     }
 
-    private void startVitamioPlayer() {
-
+    private void startSystemPlayer() {
+        if(vv != null){
+            vv.stopPlayback();
+        }
+        Intent intent = new Intent(this, SystemVideoPlayerActivity.class);
+        if(mediaItems != null && mediaItems.size() >0){
+            Bundle bunlder = new Bundle();
+            bunlder.putSerializable("videolist",mediaItems);
+            intent.putExtra("position",position);
+            //放入Bundler
+            intent.putExtras(bunlder);
+        }else if(uri != null){
+            intent.setData(uri);
+        }
+        startActivity(intent);
+        finish();//关闭系统播放器
     }
 
     /**
