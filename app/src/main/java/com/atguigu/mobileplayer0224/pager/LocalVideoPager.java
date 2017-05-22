@@ -53,7 +53,7 @@ public class LocalVideoPager extends BaseFragment {
 //                MediaItem item = adapter.getItem(position);
 //                Toast.makeText(context, ""+item.toString(), Toast.LENGTH_SHORT).show();
                 //把系统的播放器调起来
-//                Intent intent = new Intent(context,SystemVideoPlayerActivity.class);
+//                Intent intent = new Intent();
 //                intent.setDataAndType(Uri.parse(item.getData()),"video/*");
 //                startActivity(intent);
 
