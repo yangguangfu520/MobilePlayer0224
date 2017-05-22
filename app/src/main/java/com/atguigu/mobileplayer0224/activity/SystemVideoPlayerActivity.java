@@ -38,10 +38,14 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     private static final int PROGRESS = 0;
     //隐藏控制面板
     private static final int HIDE_MEDIACONTROLLER = 1;
+    //显示网速
+    private static final int SHOW_NET_SPEED = 2;
+
     //默认视频画面
     private static final int DEFUALT_SCREEN = 0;
     //全屏视频画面
     private static final int FULL_SCREEN = 1;
+
     private VideoView vv;
     private Uri uri;
     private ArrayList<MediaItem> mediaItems;
@@ -64,6 +68,8 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     private Button btnNext;
     private Button btnSwitchScreen;
     private LinearLayout ll_buffering;
+    private LinearLayout ll_loading;
+    private TextView tv_loading_net_speed;
     private TextView tv_net_speed;
     private Utils utils;
     private MyBroadCastReceiver receiver;
@@ -97,7 +103,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     /**
      * 是否是网络资源
      */
-    private boolean isNetUri;
+    private boolean isNetUri = true;
 
     /**
      * Find the Views in the layout<br />
@@ -126,6 +132,8 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         vv = (VideoView) findViewById(R.id.vv);
         ll_buffering = (LinearLayout) findViewById(R.id.ll_buffering);
         tv_net_speed = (TextView) findViewById(R.id.tv_net_speed);
+        ll_loading = (LinearLayout)findViewById(R.id.ll_loading);
+        tv_loading_net_speed = (TextView)findViewById(R.id.tv_loading_net_speed);
         btnVoice.setOnClickListener(this);
         btnSwitchPlayer.setOnClickListener(this);
         btnExit.setOnClickListener(this);
@@ -138,6 +146,9 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         seekbarVoice.setMax(maxVoice);
         //设置当前进度
         seekbarVoice.setProgress(currentVoice);
+
+        //发消息开始显示网速
+        handler.sendEmptyMessage(SHOW_NET_SPEED);
     }
 
 
@@ -259,6 +270,14 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
+                case SHOW_NET_SPEED:
+                    if(isNetUri){
+                        String netSpeed = utils.getNetSpeed(SystemVideoPlayerActivity.this);
+                        tv_loading_net_speed.setText("正在加载中...."+netSpeed);
+                        tv_net_speed.setText("正在缓冲...."+netSpeed);
+                        sendEmptyMessageDelayed(SHOW_NET_SPEED,1000);
+                    }
+                    break;
                 case PROGRESS:
                     //得到当前进度
                     int currentPosition = vv.getCurrentPosition();
@@ -546,11 +565,21 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
                 //发消息开始更新播放进度
                 handler.sendEmptyMessage(PROGRESS);
 
+                //隐藏加载效果画面
+                ll_loading.setVisibility(View.GONE);
+
                 //默认隐藏
                 hideMediaController();
 
                 //设置默认屏幕
                 setVideoType(DEFUALT_SCREEN);
+
+//                mp.setOnSeekCompleteListener(new MediaPlayer.OnSeekCompleteListener() {
+//                    @Override
+//                    public void onSeekComplete(MediaPlayer mp) {
+//                        Toast.makeText(SystemVideoPlayerActivity.this, "拖动完成", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
             }
         });
 
@@ -668,6 +697,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
             //还是在列表范围内容
             MediaItem mediaItem = mediaItems.get(position);
             isNetUri = utils.isNetUri(mediaItem.getData());
+            ll_loading.setVisibility(View.VISIBLE);
             vv.setVideoPath(mediaItem.getData());
             tvName.setText(mediaItem.getName());
 
@@ -686,6 +716,8 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
             //还是在列表范围内容
             MediaItem mediaItem = mediaItems.get(position);
             isNetUri = utils.isNetUri(mediaItem.getData());
+            ll_loading.setVisibility(View.VISIBLE);
+
             vv.setVideoPath(mediaItem.getData());
             tvName.setText(mediaItem.getName());
 

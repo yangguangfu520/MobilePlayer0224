@@ -17,6 +17,28 @@
     <include layout="@layout/media_controller" />
 
     <LinearLayout
+        android:id="@+id/ll_loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_player_loading_background"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/tv_loading_net_speed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="正在加载中....15kb/s"
+            android:textColor="#ffffff" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/ll_buffering"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -30,11 +52,11 @@
             android:layout_height="wrap_content" />
 
         <TextView
-            android:textColor="#ffffff"
             android:id="@+id/tv_net_speed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="正在缓冲....15kb/s" />
+            android:text="正在缓冲....15kb/s"
+            android:textColor="#ffffff" />
     </LinearLayout>
 
 </RelativeLayout>
