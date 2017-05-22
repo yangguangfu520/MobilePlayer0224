@@ -92,6 +92,11 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     private int maxVoice;
     //是否静音
     private boolean isMute = false;
+    /**
+     * 是否是网络资源
+     *
+     */
+    private boolean isNetUri;
 
     /**
      * Find the Views in the layout<br />
@@ -262,6 +267,16 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
                     //得到系统时间
                     tvSystemTime.setText(getSystemTime());
 
+                    //设置视频缓存效果
+                    if(isNetUri){
+                        int bufferPercentage = vv.getBufferPercentage();//0~100;
+                        int totalBuffer = bufferPercentage*seekbarVideo.getMax();
+                        int secondaryProgress =totalBuffer/100;
+                        seekbarVideo.setSecondaryProgress(secondaryProgress);
+                    }else{
+                        seekbarVideo.setSecondaryProgress(0);
+                    }
+
                     //循环发消息
                     sendEmptyMessageDelayed(PROGRESS, 1000);
 
@@ -309,11 +324,13 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
             MediaItem mediaItem = mediaItems.get(position);
             tvName.setText(mediaItem.getName());
             vv.setVideoPath(mediaItem.getData());
+            isNetUri =  utils.isNetUri(mediaItem.getData());
 
         } else if (uri != null) {
             //设置播放地址
             vv.setVideoURI(uri);
             tvName.setText(uri.toString());
+            isNetUri =  utils.isNetUri(uri.toString());
         }
 
         setButtonStatus();
@@ -610,8 +627,10 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         if (position > 0) {
             //还是在列表范围内容
             MediaItem mediaItem = mediaItems.get(position);
+            isNetUri =  utils.isNetUri(mediaItem.getData());
             vv.setVideoPath(mediaItem.getData());
             tvName.setText(mediaItem.getName());
+
 
             //设置按钮状态
             setButtonStatus();
@@ -626,6 +645,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         if (position < mediaItems.size()) {
             //还是在列表范围内容
             MediaItem mediaItem = mediaItems.get(position);
+            isNetUri =  utils.isNetUri(mediaItem.getData());
             vv.setVideoPath(mediaItem.getData());
             tvName.setText(mediaItem.getName());
 
