@@ -14,6 +14,27 @@
         android:layout_height="match_parent"
         android:layout_centerInParent="true" />
 
-    <include layout="@layout/media_controller"/>
+    <include layout="@layout/media_controller" />
+
+    <LinearLayout
+        android:id="@+id/ll_buffering"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:textColor="#ffffff"
+            android:id="@+id/tv_net_speed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="正在缓冲....15kb/s" />
+    </LinearLayout>
 
 </RelativeLayout>

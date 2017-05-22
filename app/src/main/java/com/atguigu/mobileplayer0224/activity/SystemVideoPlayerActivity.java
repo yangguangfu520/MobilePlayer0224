@@ -63,6 +63,8 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     private Button btnStartPause;
     private Button btnNext;
     private Button btnSwitchScreen;
+    private LinearLayout ll_buffering;
+    private TextView tv_net_speed;
     private Utils utils;
     private MyBroadCastReceiver receiver;
     /**
@@ -94,7 +96,6 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     private boolean isMute = false;
     /**
      * 是否是网络资源
-     *
      */
     private boolean isNetUri;
 
@@ -123,7 +124,8 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         btnNext = (Button) findViewById(R.id.btn_next);
         btnSwitchScreen = (Button) findViewById(R.id.btn_switch_screen);
         vv = (VideoView) findViewById(R.id.vv);
-
+        ll_buffering = (LinearLayout) findViewById(R.id.ll_buffering);
+        tv_net_speed = (TextView) findViewById(R.id.tv_net_speed);
         btnVoice.setOnClickListener(this);
         btnSwitchPlayer.setOnClickListener(this);
         btnExit.setOnClickListener(this);
@@ -152,7 +154,6 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
             isMute = !isMute;
 
             updateVoice(isMute);
-
 
 
         } else if (v == btnSwitchPlayer) {
@@ -185,19 +186,20 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     }
 
     private void updateVoice(boolean isMute) {
-        if(isMute){
+        if (isMute) {
             //静音
-            am.setStreamVolume(AudioManager.STREAM_MUSIC,0,0);
+            am.setStreamVolume(AudioManager.STREAM_MUSIC, 0, 0);
             seekbarVoice.setProgress(0);
-        }else{
+        } else {
             //非静音
-            am.setStreamVolume(AudioManager.STREAM_MUSIC,currentVoice,0);
+            am.setStreamVolume(AudioManager.STREAM_MUSIC, currentVoice, 0);
             seekbarVoice.setProgress(currentVoice);
         }
     }
 
     /**
      * 设置视频的全屏和默认
+     *
      * @param videoType
      */
     private void setVideoType(int videoType) {
@@ -250,6 +252,8 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         }
     }
 
+    private int preCurrentPosition;
+
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -268,13 +272,27 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
                     tvSystemTime.setText(getSystemTime());
 
                     //设置视频缓存效果
-                    if(isNetUri){
+                    if (isNetUri) {
                         int bufferPercentage = vv.getBufferPercentage();//0~100;
-                        int totalBuffer = bufferPercentage*seekbarVideo.getMax();
-                        int secondaryProgress =totalBuffer/100;
+                        int totalBuffer = bufferPercentage * seekbarVideo.getMax();
+                        int secondaryProgress = totalBuffer / 100;
                         seekbarVideo.setSecondaryProgress(secondaryProgress);
-                    }else{
+                    } else {
                         seekbarVideo.setSecondaryProgress(0);
+                    }
+
+                    if(isNetUri && vv.isPlaying()){
+
+                        int duration = currentPosition - preCurrentPosition;
+                        if(duration <500){
+                            //卡
+                            ll_buffering.setVisibility(View.VISIBLE);
+                        }else{
+                            //不卡
+                            ll_buffering.setVisibility(View.GONE);
+                        }
+
+                        preCurrentPosition = currentPosition;
                     }
 
                     //循环发消息
@@ -324,13 +342,13 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
             MediaItem mediaItem = mediaItems.get(position);
             tvName.setText(mediaItem.getName());
             vv.setVideoPath(mediaItem.getData());
-            isNetUri =  utils.isNetUri(mediaItem.getData());
+            isNetUri = utils.isNetUri(mediaItem.getData());
 
         } else if (uri != null) {
             //设置播放地址
             vv.setVideoURI(uri);
             tvName.setText(uri.toString());
-            isNetUri =  utils.isNetUri(uri.toString());
+            isNetUri = utils.isNetUri(uri.toString());
         }
 
         setButtonStatus();
@@ -418,12 +436,12 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     public boolean onTouchEvent(MotionEvent event) {
         //把事件交给手势识别器解析
         detector.onTouchEvent(event);
-        switch (event.getAction()){
+        switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 //1.记录相关参数
                 dowY = event.getY();
                 mVol = am.getStreamVolume(AudioManager.STREAM_MUSIC);
-                touchRang = Math.min(screenHeight,screenWidth);//screenHeight
+                touchRang = Math.min(screenHeight, screenWidth);//screenHeight
                 handler.removeMessages(HIDE_MEDIACONTROLLER);
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -433,12 +451,12 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
                 float distanceY = dowY - endY;
                 //原理：在屏幕滑动的距离： 滑动的总距离 = 要改变的声音： 最大声音
                 //要改变的声音 = （在屏幕滑动的距离/ 滑动的总距离）*最大声音;
-                float delta = (distanceY/touchRang)*maxVoice;
+                float delta = (distanceY / touchRang) * maxVoice;
 
 
-                if(delta != 0){
+                if (delta != 0) {
                     //最终声音 = 原来的+ 要改变的声音
-                    int mVoice = (int) Math.min(Math.max(mVol+delta,0),maxVoice);
+                    int mVoice = (int) Math.min(Math.max(mVol + delta, 0), maxVoice);
                     //0~15
 
                     updateVoiceProgress(mVoice);
@@ -451,7 +469,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
                 break;
             case MotionEvent.ACTION_UP:
-                handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER,4000);
+                handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 4000);
                 break;
         }
         return super.onTouchEvent(event);
@@ -586,7 +604,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         seekbarVoice.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if(fromUser){
+                if (fromUser) {
                     updateVoiceProgress(progress);
                 }
 
@@ -602,21 +620,43 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
             }
         });
+
+//        //设置监听卡
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+//            vv.setOnInfoListener(new MediaPlayer.OnInfoListener() {
+//                @Override
+//                public boolean onInfo(MediaPlayer mp, int what, int extra) {
+//                    switch (what) {
+//                        //拖动卡，缓存卡
+//                        case MediaPlayer.MEDIA_INFO_BUFFERING_START:
+//                            ll_buffering.setVisibility(View.VISIBLE);
+//                            break;
+//                        //拖动卡，缓存卡结束
+//                        case MediaPlayer.MEDIA_INFO_BUFFERING_END:
+//                            ll_buffering.setVisibility(View.GONE);
+//                            break;
+//                    }
+//
+//                    return true;
+//                }
+//            });
+//        }
     }
 
     /**
      * 设置滑动改变声音
+     *
      * @param progress
      */
     private void updateVoiceProgress(int progress) {
         currentVoice = progress;
         //真正改变声音
-        am.setStreamVolume(AudioManager.STREAM_MUSIC,currentVoice,0);
+        am.setStreamVolume(AudioManager.STREAM_MUSIC, currentVoice, 0);
         //改变进度条
         seekbarVoice.setProgress(currentVoice);
-        if(currentVoice <=0){
+        if (currentVoice <= 0) {
             isMute = true;
-        }else {
+        } else {
             isMute = false;
         }
 
@@ -627,7 +667,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         if (position > 0) {
             //还是在列表范围内容
             MediaItem mediaItem = mediaItems.get(position);
-            isNetUri =  utils.isNetUri(mediaItem.getData());
+            isNetUri = utils.isNetUri(mediaItem.getData());
             vv.setVideoPath(mediaItem.getData());
             tvName.setText(mediaItem.getName());
 
@@ -645,7 +685,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         if (position < mediaItems.size()) {
             //还是在列表范围内容
             MediaItem mediaItem = mediaItems.get(position);
-            isNetUri =  utils.isNetUri(mediaItem.getData());
+            isNetUri = utils.isNetUri(mediaItem.getData());
             vv.setVideoPath(mediaItem.getData());
             tvName.setText(mediaItem.getName());
 
@@ -724,17 +764,17 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(keyCode ==KeyEvent.KEYCODE_VOLUME_DOWN){
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
             currentVoice--;
             updateVoiceProgress(currentVoice);
             handler.removeMessages(HIDE_MEDIACONTROLLER);
-            handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER,4000);
+            handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 4000);
             return true;
-        }else  if(keyCode ==KeyEvent.KEYCODE_VOLUME_UP){
+        } else if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
             currentVoice++;
             updateVoiceProgress(currentVoice);
             handler.removeMessages(HIDE_MEDIACONTROLLER);
-            handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER,4000);
+            handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 4000);
             return true;
         }
         return super.onKeyDown(keyCode, event);
