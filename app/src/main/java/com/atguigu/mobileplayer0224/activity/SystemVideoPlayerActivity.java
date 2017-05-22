@@ -387,10 +387,54 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
     }
 
+    //记录坐标
+    private float dowY;
+    //滑动的初始声音
+    private int mVol;
+    //滑动的最大区域
+    private float touchRang;
+
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         //把事件交给手势识别器解析
         detector.onTouchEvent(event);
+        switch (event.getAction()){
+            case MotionEvent.ACTION_DOWN:
+                //1.记录相关参数
+                dowY = event.getY();
+                mVol = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+                touchRang = Math.min(screenHeight,screenWidth);//screenHeight
+                handler.removeMessages(HIDE_MEDIACONTROLLER);
+                break;
+            case MotionEvent.ACTION_MOVE:
+                //2.滑动的时候来到新的位置
+                float endY = event.getY();
+                //3.计算滑动的距离
+                float distanceY = dowY - endY;
+                //原理：在屏幕滑动的距离： 滑动的总距离 = 要改变的声音： 最大声音
+                //要改变的声音 = （在屏幕滑动的距离/ 滑动的总距离）*最大声音;
+                float delta = (distanceY/touchRang)*maxVoice;
+
+
+                if(delta != 0){
+                    //最终声音 = 原来的+ 要改变的声音
+                    int mVoice = (int) Math.min(Math.max(mVol+delta,0),maxVoice);
+                    //0~15
+
+                    updateVoiceProgress(mVoice);
+                }
+
+
+                //注意不要重新赋值
+//                dowY = event.getY();
+
+
+                break;
+            case MotionEvent.ACTION_UP:
+                handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER,4000);
+                break;
+        }
         return super.onTouchEvent(event);
     }
 
