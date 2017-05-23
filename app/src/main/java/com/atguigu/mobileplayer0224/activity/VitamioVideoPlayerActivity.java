@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -321,19 +322,19 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
                         seekbarVideo.setSecondaryProgress(0);
                     }
 
-                    if (isNetUri && vv.isPlaying()) {
-
-                        int duration = currentPosition - preCurrentPosition;
-                        if (duration < 500) {
-                            //卡
-                            ll_buffering.setVisibility(View.VISIBLE);
-                        } else {
-                            //不卡
-                            ll_buffering.setVisibility(View.GONE);
-                        }
-
-                        preCurrentPosition = currentPosition;
-                    }
+//                    if (isNetUri && vv.isPlaying()) {
+//
+//                        int duration = currentPosition - preCurrentPosition;
+//                        if (duration < 500) {
+//                            //卡
+//                            ll_buffering.setVisibility(View.VISIBLE);
+//                        } else {
+//                            //不卡
+//                            ll_buffering.setVisibility(View.GONE);
+//                        }
+//
+//                        preCurrentPosition = currentPosition;
+//                    }
 
                     //循环发消息
                     sendEmptyMessageDelayed(PROGRESS, 1000);
@@ -674,25 +675,25 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
         });
 
 //        //设置监听卡
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-//            vv.setOnInfoListener(new MediaPlayer.OnInfoListener() {
-//                @Override
-//                public boolean onInfo(MediaPlayer mp, int what, int extra) {
-//                    switch (what) {
-//                        //拖动卡，缓存卡
-//                        case MediaPlayer.MEDIA_INFO_BUFFERING_START:
-//                            ll_buffering.setVisibility(View.VISIBLE);
-//                            break;
-//                        //拖动卡，缓存卡结束
-//                        case MediaPlayer.MEDIA_INFO_BUFFERING_END:
-//                            ll_buffering.setVisibility(View.GONE);
-//                            break;
-//                    }
-//
-//                    return true;
-//                }
-//            });
-//        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            vv.setOnInfoListener(new MediaPlayer.OnInfoListener() {
+                @Override
+                public boolean onInfo(MediaPlayer mp, int what, int extra) {
+                    switch (what) {
+                        //拖动卡，缓存卡
+                        case MediaPlayer.MEDIA_INFO_BUFFERING_START:
+                            ll_buffering.setVisibility(View.VISIBLE);
+                            break;
+                        //拖动卡，缓存卡结束
+                        case MediaPlayer.MEDIA_INFO_BUFFERING_END:
+                            ll_buffering.setVisibility(View.GONE);
+                            break;
+                    }
+
+                    return true;
+                }
+            });
+        }
     }
 
     private void showErrorDialog() {

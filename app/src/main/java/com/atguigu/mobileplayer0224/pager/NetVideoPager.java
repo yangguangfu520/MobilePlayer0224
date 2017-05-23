@@ -1,7 +1,7 @@
 package com.atguigu.mobileplayer0224.pager;
 
 import android.content.Intent;
-import android.net.Uri;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.atguigu.mobileplayer0224.R;
 import com.atguigu.mobileplayer0224.activity.SystemVideoPlayerActivity;
 import com.atguigu.mobileplayer0224.adapter.NetVideoAdapter;
+import com.atguigu.mobileplayer0224.domain.MediaItem;
 import com.atguigu.mobileplayer0224.domain.MoveInfo;
 import com.atguigu.mobileplayer0224.fragment.BaseFragment;
 import com.google.gson.Gson;
@@ -19,6 +20,7 @@ import org.xutils.common.Callback;
 import org.xutils.http.RequestParams;
 import org.xutils.x;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,6 +35,7 @@ public class NetVideoPager extends BaseFragment {
 
     private ListView lv;
     private TextView tv_nodata;
+    private ArrayList<MediaItem> mediaItems;
     //重写视图
     @Override
     public View initView() {
@@ -46,8 +49,17 @@ public class NetVideoPager extends BaseFragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 MoveInfo.TrailersBean item = adapter.getItem(position);
 
+//                Intent intent = new Intent(context, SystemVideoPlayerActivity.class);
+//                intent.setDataAndType(Uri.parse(item.getUrl()),"video/*");
+//                startActivity(intent);
+
                 Intent intent = new Intent(context, SystemVideoPlayerActivity.class);
-                intent.setDataAndType(Uri.parse(item.getUrl()),"video/*");
+
+                Bundle bunlder = new Bundle();
+                bunlder.putSerializable("videolist",mediaItems);
+                intent.putExtra("position",position);
+                //放入Bundler
+                intent.putExtras(bunlder);
                 startActivity(intent);
 
             }
@@ -69,9 +81,10 @@ public class NetVideoPager extends BaseFragment {
         x.http().get(request, new Callback.CommonCallback<String>() {
             @Override
             public void onSuccess(String result) {
-
                 Log.e("TAG","xUtils联网成功=="+result);
                 processData(result);
+
+
             }
 
             @Override
@@ -99,7 +112,20 @@ public class NetVideoPager extends BaseFragment {
     private void processData(String json) {
         MoveInfo moveInfo = new Gson().fromJson(json, MoveInfo.class);
         List<MoveInfo.TrailersBean> datas = moveInfo.getTrailers();
+
+
+
         if(datas != null && datas.size() >0){
+            //集合数据MediaItem
+            mediaItems = new ArrayList<>();
+           for(int i = 0; i <datas.size() ; i++) {
+               MediaItem mediaItem = new MediaItem();
+               mediaItem.setData(datas.get(i).getUrl());
+               mediaItem.setName(datas.get(i).getMovieName());
+               mediaItems.add(mediaItem);
+
+           }
+
             tv_nodata.setVisibility(View.GONE);
             //有数据-适配器
             adapter = new NetVideoAdapter(context,datas);

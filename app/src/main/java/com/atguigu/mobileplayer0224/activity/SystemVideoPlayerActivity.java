@@ -359,7 +359,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
         initData();
 
-        findViews();
+        findViews();//初始化视图
         getData();
 
         setListener();
@@ -457,6 +457,9 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         am = (AudioManager) getSystemService(AUDIO_SERVICE);
         currentVoice = am.getStreamVolume(AudioManager.STREAM_MUSIC);
         maxVoice = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+
+
+
 
     }
 
@@ -657,26 +660,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
             }
         });
 
-        //监听拖动声音
-        seekbarVoice.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser) {
-                    updateVoiceProgress(progress);
-                }
 
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
 
 //        //设置监听卡
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
@@ -698,6 +682,27 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 //                }
 //            });
 //        }
+
+        //监听拖动声音
+        seekbarVoice.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    updateVoiceProgress(progress);
+                }
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
     }
 
     private void startVitamioPlayer() {
