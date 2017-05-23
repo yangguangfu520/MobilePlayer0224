@@ -1,13 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-
-    <ListView
-        android:id="@+id/lv"
+    <com.cjj.MaterialRefreshLayout
+        android:id="@+id/refresh"
+        app:isLoadMore="true"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <ListView
+            android:id="@+id/lv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+
+    </com.cjj.MaterialRefreshLayout>
 
     <TextView
         android:id="@+id/tv_nodata"

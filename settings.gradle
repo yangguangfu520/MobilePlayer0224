@@ -1,1 +1,1 @@
-include ':app', ':StartAllVideoPlayer',  ':vitamio'
+include ':app', ':StartAllVideoPlayer', ':vitamio'
