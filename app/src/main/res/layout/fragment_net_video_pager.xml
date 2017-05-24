@@ -7,6 +7,9 @@
     <com.cjj.MaterialRefreshLayout
         android:id="@+id/refresh"
         app:isLoadMore="true"
+        app:overlay="true"
+        app:wave_show="true"
+        app:wave_color="#90ffffff"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
