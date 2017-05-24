@@ -1,19 +1,26 @@
 package com.atguigu.mobileplayer0224.service;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.atguigu.mobileplayer0224.IMusicPlayService;
+import com.atguigu.mobileplayer0224.R;
+import com.atguigu.mobileplayer0224.activity.AudioPlayerActivity;
 import com.atguigu.mobileplayer0224.domain.MediaItem;
 
 import java.io.IOException;
@@ -111,6 +118,8 @@ public class MusicPlayService extends Service {
     private MediaItem mediaItem;
 
     public static final String OPEN_COMPLETE = "com.atguigu.mobileplayer.OPEN_COMPLETE";
+
+    private NotificationManager nm;
 
     @Override
     public void onCreate() {
@@ -251,8 +260,21 @@ public class MusicPlayService extends Service {
     /**
      * 播放音频
      */
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     private void start() {
         mediaPlayer.start();//开始播放
+        nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        Intent intent = new Intent(this, AudioPlayerActivity.class);
+        intent.putExtra("notification",true);
+        PendingIntent pi = PendingIntent.getActivity(this,0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+        Notification notifation = new Notification.Builder(this)
+                .setSmallIcon(R.drawable.notification_music_playing)
+                .setContentTitle("321音乐")
+                .setContentText("正在播放："+getAudioName())
+                 .setContentIntent(pi)
+                .build();
+        nm.notify(1,notifation);
     }
 
     /**
@@ -260,6 +282,8 @@ public class MusicPlayService extends Service {
      */
     private void pause() {
         mediaPlayer.pause();
+        //取消通知
+        nm.cancel(1);
     }
 
     /**
