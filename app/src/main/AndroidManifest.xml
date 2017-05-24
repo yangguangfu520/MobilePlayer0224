@@ -284,6 +284,12 @@
             android:screenOrientation="landscape"
             android:theme="@style/noAnimation_Theme" />
         <activity android:name=".activity.AudioPlayerActivity"></activity>
+
+        <service android:name=".service.MusicPlayService">
+            <intent-filter >
+                <action android:name="com.atguigu.mobileplayer0224.service.MUSICPLAYSERVICE"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>
