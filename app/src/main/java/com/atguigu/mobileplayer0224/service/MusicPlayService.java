@@ -316,6 +316,8 @@ public class MusicPlayService extends Service {
      * @param position
      */
     private void seekTo(int position) {
+        //MediaPlayer的seekTo
+        mediaPlayer.seekTo(position);
     }
 
     /**
