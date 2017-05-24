@@ -1,12 +1,16 @@
 package com.atguigu.mobileplayer0224.activity;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -20,6 +24,7 @@ import android.widget.TextView;
 import com.atguigu.mobileplayer0224.IMusicPlayService;
 import com.atguigu.mobileplayer0224.R;
 import com.atguigu.mobileplayer0224.service.MusicPlayService;
+import com.atguigu.mobileplayer0224.utils.Utils;
 
 import static com.atguigu.mobileplayer0224.R.id.iv_icon;
 
@@ -40,6 +45,37 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
     //这个就是IMusicPlayService.Stub的实例
     private IMusicPlayService service;
     private int position;
+    private MyReceiver receiver;
+    private Utils utils;
+
+    private final  static  int PROGRESS = 0;
+
+    private Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what){
+                case PROGRESS:
+                    try {
+                        int currentPosition = service.getCurrentPosition();
+                        seekbarAudio.setProgress(currentPosition);
+
+                        //设置更新时间
+                        tvTime.setText(utils.stringForTime(currentPosition)+"/"+utils.stringForTime(service.getDuration()));
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+
+
+
+                    //每秒中更新一次
+                    removeMessages(PROGRESS);
+                    sendEmptyMessageDelayed(PROGRESS,1000);
+
+                    break;
+            }
+        }
+    };
     //连接好服务后的回调
     private ServiceConnection conon = new ServiceConnection() {
 
@@ -55,6 +91,7 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
             if(service != null){
                 try {
                     service.openAudio(position);//打开播放第0个音频
+                    //service.getDuration();//能直接调用了-不能
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
@@ -146,9 +183,52 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initData();
         findViews();
         getData();
         startAndBindService();
+    }
+
+    private void initData() {
+        //注册广播
+        receiver = new MyReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(MusicPlayService.OPEN_COMPLETE);
+        registerReceiver(receiver,intentFilter);
+
+        utils = new Utils();
+    }
+
+    class MyReceiver extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //主线程
+            setViewData();
+
+        }
+    }
+
+
+
+
+
+    private void setViewData() {
+        try {
+            tvArtist.setText(service.getArtistName());
+            tvAudioname.setText(service.getAudioName());
+            int duration = service.getDuration();
+            seekbarAudio.setMax(duration);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        //发消息更新进度
+        handler.sendEmptyMessage(PROGRESS);
+
+
+
+
+
     }
 
     private void getData() {
@@ -157,11 +237,19 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
+
         if(conon != null){
             unbindService(conon);
             conon = null;
         }
+
+        //广播取消注册
+        if(receiver != null){
+            unregisterReceiver(receiver);
+            receiver = null;
+        }
+
+        super.onDestroy();
     }
 
     /**
