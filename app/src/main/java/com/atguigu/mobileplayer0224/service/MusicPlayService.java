@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -149,12 +150,21 @@ public class MusicPlayService extends Service {
      * 播放模式
      */
     private int playmode = REPEAT_NORMAL;
+    /**
+     * true:正常播放完成
+     * false:人为手动点击下一个
+     */
+    private boolean isCompletion = false;
+
+    private SharedPreferences sp;
 
     @Override
     public void onCreate() {
         super.onCreate();
         Log.e("TAG","MusicPlayService--onCreate()");
         //加载列表数据
+        sp = getSharedPreferences("atguigu",MODE_PRIVATE);
+        playmode = sp.getInt("playmode",getPlaymode());
         getData();
     }
 
@@ -234,6 +244,10 @@ public class MusicPlayService extends Service {
                     //准备
                     mediaPlayer.prepareAsync();
 
+                    if(playmode== MusicPlayService.REPEAT_SINGLE){
+                        isCompletion = false;
+                    }
+
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -282,6 +296,7 @@ public class MusicPlayService extends Service {
         @Override
         public void onCompletion(MediaPlayer mp) {
             //播放下一个
+            isCompletion = true;
             next();
         }
     }
@@ -376,12 +391,118 @@ public class MusicPlayService extends Service {
      * 播放下一个
      */
     private void next() {
+        //1.根据不同的播放模式设置不同的下标位置
+        setNextPosition();
+
+        //2.根据不同的下标位置打开对应的音频并且播放，边界处理
+        openNextPosition();
+    }
+
+    //根据不同的下标位置打开对应的音频并且播放，边界处理
+    private void openNextPosition() {
+        int playmode = getPlaymode();
+
+        if (playmode == MusicPlayService.REPEAT_NORMAL) {
+            if(position < mediaItems.size()){
+                //合法范围
+                openAudio(position);
+
+            }else{
+                //变为合法
+                position = mediaItems.size()-1;
+            }
+        } else if (playmode == MusicPlayService.REPEAT_SINGLE) {
+            if(position < mediaItems.size()){
+                //合法范围
+                openAudio(position);
+            }else{
+                //变为合法
+                position = mediaItems.size()-1;
+            }
+
+        } else if (playmode == MusicPlayService.REPEAT_ALL) {
+            openAudio(position);
+        }
+    }
+
+    /**
+     * 根据不同的播放模式设置不同的下标位置
+     */
+    private void setNextPosition() {
+        int playmode = getPlaymode();
+
+        if (playmode == MusicPlayService.REPEAT_NORMAL) {
+            //还没有越界处理
+            position ++;
+        } else if (playmode == MusicPlayService.REPEAT_SINGLE) {
+            if(!isCompletion){
+                position ++;
+            }
+
+        } else if (playmode == MusicPlayService.REPEAT_ALL) {
+            //合法的位置
+            position ++;
+            if(position > mediaItems.size()-1){
+                position = 0;
+            }
+        }
     }
 
     /**
      * 播放上一个
      */
     private void pre() {
+        //1.根据不同的播放模式设置不同的下标位置
+        setPrePosition();
+
+        //2.根据不同的下标位置打开对应的音频并且播放，边界处理
+        openPrePosition();
+    }
+
+    private void openPrePosition() {
+        int playmode = getPlaymode();
+
+        if (playmode == MusicPlayService.REPEAT_NORMAL) {
+            if(position >= 0){
+                //合法范围
+                openAudio(position);
+
+            }else{
+                //变为合法
+                position = 0;
+            }
+        } else if (playmode == MusicPlayService.REPEAT_SINGLE) {
+            if(position >=0 ){
+                //合法范围
+                openAudio(position);
+            }else{
+                //变为合法
+                position = 0;
+            }
+
+        } else if (playmode == MusicPlayService.REPEAT_ALL) {
+            openAudio(position);
+        }
+    }
+
+    private void setPrePosition() {
+        int playmode = getPlaymode();
+
+        if (playmode == MusicPlayService.REPEAT_NORMAL) {
+            //还没有越界处理
+            position --;
+        } else if (playmode == MusicPlayService.REPEAT_SINGLE) {
+            if(!isCompletion){
+                position --;
+            }
+
+        } else if (playmode == MusicPlayService.REPEAT_ALL) {
+            //合法的位置
+            position --;
+            if(position < 0){
+                position = mediaItems.size()-1;
+            }
+        }
     }
 
     /**
@@ -398,5 +519,6 @@ public class MusicPlayService extends Service {
      */
     public void setPlaymode(int playmode) {
         this.playmode = playmode;
+        sp.edit().putInt("playmode",playmode).commit();
     }
 }

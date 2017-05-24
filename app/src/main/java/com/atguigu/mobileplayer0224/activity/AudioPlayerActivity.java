@@ -188,6 +188,11 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
             // Handle clicks for btnPlaymode
             setPlayMode();
         } else if (v == btnPre) {
+            try {
+                service.pre();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
             // Handle clicks for btnPre
         } else if (v == btnStartPause) {
             // Handle clicks for btnStartPause
@@ -208,6 +213,11 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
             }
 
         } else if (v == btnNext) {
+            try {
+                service.next();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
             // Handle clicks for btnNext
         } else if (v == btnLyric) {
             // Handle clicks for btnLyric
@@ -282,6 +292,7 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
 
     private void setViewData() {
         try {
+            setButtonImage();
             tvArtist.setText(service.getArtistName());
             tvAudioname.setText(service.getAudioName());
             int duration = service.getDuration();
