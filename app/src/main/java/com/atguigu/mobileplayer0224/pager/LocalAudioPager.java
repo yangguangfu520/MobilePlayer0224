@@ -15,7 +15,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.atguigu.mobileplayer0224.R;
-import com.atguigu.mobileplayer0224.activity.SystemVideoPlayerActivity;
+import com.atguigu.mobileplayer0224.activity.AudioPlayerActivity;
 import com.atguigu.mobileplayer0224.adapter.LocalVideoAdapter;
 import com.atguigu.mobileplayer0224.domain.MediaItem;
 import com.atguigu.mobileplayer0224.fragment.BaseFragment;
@@ -59,7 +59,7 @@ public class LocalAudioPager extends BaseFragment {
 
                 //传递视频列表过去
 
-                Intent intent = new Intent(context, SystemVideoPlayerActivity.class);
+                Intent intent = new Intent(context, AudioPlayerActivity.class);
 
                 Bundle bunlder = new Bundle();
                 bunlder.putSerializable("videolist",mediaItems);

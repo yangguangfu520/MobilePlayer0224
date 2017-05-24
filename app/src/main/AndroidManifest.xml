@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.atguigu.mobileplayer0224">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -28,29 +28,33 @@
             android:name=".MainActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:launchMode="singleTask" />
-        <activity android:name=".activity.SystemVideoPlayerActivity"
-            android:screenOrientation="landscape"
+        <activity
+            android:name=".activity.SystemVideoPlayerActivity"
             android:label="@string/plyaer_name"
-            android:theme="@style/noAnimation_Theme"
-
-            >
-
+            android:screenOrientation="landscape"
+            android:theme="@style/noAnimation_Theme">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data android:scheme="rtsp" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="video/*" />
                 <data android:mimeType="application/sdp" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data android:scheme="http" />
                 <data android:mimeType="video/mpeg4" />
                 <data android:mimeType="video/mp4" />
@@ -58,7 +62,6 @@
                 <data android:mimeType="video/3gpp" />
                 <data android:mimeType="video/3gpp2" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -274,14 +277,13 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-
-
         </activity>
-        <activity android:name=".activity.VitamioVideoPlayerActivity"
-            android:screenOrientation="landscape"
+        <activity
+            android:name=".activity.VitamioVideoPlayerActivity"
             android:launchMode="singleTask"
-            android:theme="@style/noAnimation_Theme"
-            ></activity>
+            android:screenOrientation="landscape"
+            android:theme="@style/noAnimation_Theme" />
+        <activity android:name=".activity.AudioPlayerActivity"></activity>
     </application>
 
 </manifest>
