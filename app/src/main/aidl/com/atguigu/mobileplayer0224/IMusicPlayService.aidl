@@ -81,5 +81,10 @@ interface IMusicPlayService {
                  */
                  void  pre();
 
+                 /**
+                 * 是否正在播放
+                 */
+                 boolean isPlaying();
+
 
 }
