@@ -9,12 +9,10 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Build;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -104,6 +102,16 @@ public class MusicPlayService extends Service {
         public boolean isPlaying() throws RemoteException {
             return mediaPlayer.isPlaying();
         }
+
+        @Override
+        public int getPlaymode() throws RemoteException {
+            return service.getPlaymode();
+        }
+
+        @Override
+        public void setPlaymode(int playmode) throws RemoteException {
+            service.setPlaymode(playmode);
+        }
     };
 
     private ArrayList<MediaItem> mediaItems;
@@ -119,7 +127,28 @@ public class MusicPlayService extends Service {
 
     public static final String OPEN_COMPLETE = "com.atguigu.mobileplayer.OPEN_COMPLETE";
 
+    //通知服务管理
     private NotificationManager nm;
+
+    /**
+     * 顺序播放
+     */
+    public static final int REPEAT_NORMAL = 1;
+
+    /**
+     * 单曲循环播放
+     */
+    public static final int REPEAT_SINGLE = 2;
+
+    /**
+     * 全部循环播放
+     */
+    public static final int REPEAT_ALL = 3;
+
+    /**
+     * 播放模式
+     */
+    private int playmode = REPEAT_NORMAL;
 
     @Override
     public void onCreate() {
@@ -260,13 +289,12 @@ public class MusicPlayService extends Service {
     /**
      * 播放音频
      */
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     private void start() {
         mediaPlayer.start();//开始播放
         nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         Intent intent = new Intent(this, AudioPlayerActivity.class);
-        intent.putExtra("notification",true);
+        intent.putExtra("notification",true);//是否来自状态栏
         PendingIntent pi = PendingIntent.getActivity(this,0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
         Notification notifation = new Notification.Builder(this)
                 .setSmallIcon(R.drawable.notification_music_playing)
@@ -356,5 +384,19 @@ public class MusicPlayService extends Service {
     private void pre() {
     }
 
+    /**
+     * 得到播放模式
+     * @return
+     */
+    public int getPlaymode() {
+        return playmode;
+    }
 
+    /**
+     * 设置播放模式
+     * @param playmode
+     */
+    public void setPlaymode(int playmode) {
+        this.playmode = playmode;
+    }
 }
