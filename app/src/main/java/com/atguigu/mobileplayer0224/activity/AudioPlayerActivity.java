@@ -25,8 +25,13 @@ import android.widget.TextView;
 
 import com.atguigu.mobileplayer0224.IMusicPlayService;
 import com.atguigu.mobileplayer0224.R;
+import com.atguigu.mobileplayer0224.domain.MediaItem;
 import com.atguigu.mobileplayer0224.service.MusicPlayService;
 import com.atguigu.mobileplayer0224.utils.Utils;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import static com.atguigu.mobileplayer0224.R.id.iv_icon;
 
@@ -95,7 +100,7 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
                 try {
                     if (notification) {
                         //从新从Service获取数据
-                        setViewData();
+                        setViewData(null);
                     } else {
                         service.openAudio(position);//打开播放第0个音频
                         tvArtist.setText(service.getArtistName());
@@ -287,6 +292,9 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
         registerReceiver(receiver, intentFilter);
 
         utils = new Utils();
+
+        //1.注册EventButs
+        EventBus.getDefault().register(this);
     }
 
     class MyReceiver extends BroadcastReceiver {
@@ -294,13 +302,14 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
         @Override
         public void onReceive(Context context, Intent intent) {
             //主线程
-            setViewData();
+            setViewData(null);
 
         }
     }
 
 
-    private void setViewData() {
+    @Subscribe(threadMode= ThreadMode.MAIN)
+    public void setViewData(MediaItem mediaItem) {
         try {
             long endTime = SystemClock.uptimeMillis();
             long passTime = endTime - MusicPlayService.startTime;
@@ -348,6 +357,8 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
             receiver = null;
         }
 
+        //2.取消注册EventBus
+        EventBus.getDefault().unregister(this);
         super.onDestroy();
     }
 
