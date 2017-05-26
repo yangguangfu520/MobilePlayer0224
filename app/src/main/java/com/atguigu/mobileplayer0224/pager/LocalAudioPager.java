@@ -126,7 +126,7 @@ public class LocalAudioPager extends BaseFragment {
 
                         long size = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE));
                         String data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
-                        Log.e("TAG", "name==" + name + ",duration==" + duration + ",data===" + data);
+//                        Log.e("TAG", "name==" + name + ",duration==" + duration + ",data===" + data);
 
                         if(duration > 10*1000){
                             mediaItems.add(new MediaItem(name, duration, size, data));

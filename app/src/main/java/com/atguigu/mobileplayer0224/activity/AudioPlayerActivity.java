@@ -12,7 +12,9 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -96,7 +98,15 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
                         setViewData();
                     } else {
                         service.openAudio(position);//打开播放第0个音频
+                        tvArtist.setText(service.getArtistName());
+                        tvAudioname.setText(service.getAudioName());
+
                         //service.getDuration();//能直接调用了-不能
+                        long endTime = SystemClock.uptimeMillis();
+                        long passTime = endTime - MusicPlayService.startTime;
+                        Log.e("atguigu","onServiceConnected passTime=="+passTime);
+
+
                     }
 
                 } catch (RemoteException e) {
@@ -292,11 +302,21 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
 
     private void setViewData() {
         try {
-            setButtonImage();
+            long endTime = SystemClock.uptimeMillis();
+            long passTime = endTime - MusicPlayService.startTime;
+            Log.e("atguigu","setViewData passTime=="+passTime);
+
             tvArtist.setText(service.getArtistName());
             tvAudioname.setText(service.getAudioName());
+
+
+
+            setButtonImage();
+
+            //只有准备好的时候，得到的才不是-1
             int duration = service.getDuration();
             seekbarAudio.setMax(duration);
+
         } catch (RemoteException e) {
             e.printStackTrace();
         }

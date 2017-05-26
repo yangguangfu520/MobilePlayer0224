@@ -12,6 +12,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -126,7 +127,11 @@ public class MusicPlayService extends Service {
      */
     private MediaItem mediaItem;
 
+    /**
+     * 当播放准备好的时候要发的广播
+     */
     public static final String OPEN_COMPLETE = "com.atguigu.mobileplayer.OPEN_COMPLETE";
+
 
     //通知服务管理
     private NotificationManager nm;
@@ -161,10 +166,10 @@ public class MusicPlayService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.e("TAG","MusicPlayService--onCreate()");
+        Log.e("TAG", "MusicPlayService--onCreate()");
         //加载列表数据
-        sp = getSharedPreferences("atguigu",MODE_PRIVATE);
-        playmode = sp.getInt("playmode",getPlaymode());
+        sp = getSharedPreferences("atguigu", MODE_PRIVATE);
+        playmode = sp.getInt("playmode", getPlaymode());
         getData();
     }
 
@@ -195,7 +200,7 @@ public class MusicPlayService extends Service {
                         long size = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE));
                         String data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
                         String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
-                        Log.e("TAG", "name==" + name + ",duration==" + duration + ",data===" + data + ",artist==" + artist);
+//                        Log.e("TAG", "name==" + name + ",duration==" + duration + ",data===" + data + ",artist==" + artist);
 
                         if (duration > 10 * 1000) {
                             mediaItems.add(new MediaItem(name, duration, size, data, artist));
@@ -216,6 +221,8 @@ public class MusicPlayService extends Service {
         return stub;
     }
 
+    public static long startTime = 0;
+
     /**
      * 根据位置播放一个音频
      *
@@ -225,7 +232,7 @@ public class MusicPlayService extends Service {
         this.position = position;
         if (mediaItems != null && mediaItems.size() > 0) {
 
-            if(position < mediaItems.size()){
+            if (position < mediaItems.size()) {
                 mediaItem = mediaItems.get(position);
 
                 //如果不为空释放之前的播放音频的资源
@@ -244,7 +251,7 @@ public class MusicPlayService extends Service {
                     //准备
                     mediaPlayer.prepareAsync();
 
-                    if(playmode== MusicPlayService.REPEAT_SINGLE){
+                    if (playmode == MusicPlayService.REPEAT_SINGLE) {
                         isCompletion = false;
                     }
 
@@ -259,9 +266,13 @@ public class MusicPlayService extends Service {
         }
 
 
+        //开始时间
+        startTime = SystemClock.uptimeMillis();
+
+
     }
 
-    class MyOnPreparedListener implements MediaPlayer.OnPreparedListener{
+    class MyOnPreparedListener implements MediaPlayer.OnPreparedListener {
 
         @Override
         public void onPrepared(MediaPlayer mp) {
@@ -276,6 +287,7 @@ public class MusicPlayService extends Service {
 
     /**
      * 发送广播
+     *
      * @param action
      */
     private void notifyChange(String action) {
@@ -283,7 +295,7 @@ public class MusicPlayService extends Service {
         sendBroadcast(intent);
     }
 
-    class MyOnErrorListener implements MediaPlayer.OnErrorListener{
+    class MyOnErrorListener implements MediaPlayer.OnErrorListener {
         @Override
         public boolean onError(MediaPlayer mp, int what, int extra) {
             next();//播放下一个
@@ -291,7 +303,7 @@ public class MusicPlayService extends Service {
         }
     }
 
-    class MyOnCompletionListener implements MediaPlayer.OnCompletionListener{
+    class MyOnCompletionListener implements MediaPlayer.OnCompletionListener {
 
         @Override
         public void onCompletion(MediaPlayer mp) {
@@ -309,15 +321,15 @@ public class MusicPlayService extends Service {
         nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         Intent intent = new Intent(this, AudioPlayerActivity.class);
-        intent.putExtra("notification",true);//是否来自状态栏
-        PendingIntent pi = PendingIntent.getActivity(this,0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+        intent.putExtra("notification", true);//是否来自状态栏
+        PendingIntent pi = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         Notification notifation = new Notification.Builder(this)
                 .setSmallIcon(R.drawable.notification_music_playing)
                 .setContentTitle("321音乐")
-                .setContentText("正在播放："+getAudioName())
-                 .setContentIntent(pi)
+                .setContentText("正在播放：" + getAudioName())
+                .setContentIntent(pi)
                 .build();
-        nm.notify(1,notifation);
+        nm.notify(1, notifation);
     }
 
     /**
@@ -403,21 +415,21 @@ public class MusicPlayService extends Service {
         int playmode = getPlaymode();
 
         if (playmode == MusicPlayService.REPEAT_NORMAL) {
-            if(position < mediaItems.size()){
+            if (position < mediaItems.size()) {
                 //合法范围
                 openAudio(position);
 
-            }else{
+            } else {
                 //变为合法
-                position = mediaItems.size()-1;
+                position = mediaItems.size() - 1;
             }
         } else if (playmode == MusicPlayService.REPEAT_SINGLE) {
-            if(position < mediaItems.size()){
+            if (position < mediaItems.size()) {
                 //合法范围
                 openAudio(position);
-            }else{
+            } else {
                 //变为合法
-                position = mediaItems.size()-1;
+                position = mediaItems.size() - 1;
             }
 
         } else if (playmode == MusicPlayService.REPEAT_ALL) {
@@ -433,16 +445,16 @@ public class MusicPlayService extends Service {
 
         if (playmode == MusicPlayService.REPEAT_NORMAL) {
             //还没有越界处理
-            position ++;
+            position++;
         } else if (playmode == MusicPlayService.REPEAT_SINGLE) {
-            if(!isCompletion){
-                position ++;
+            if (!isCompletion) {
+                position++;
             }
 
         } else if (playmode == MusicPlayService.REPEAT_ALL) {
             //合法的位置
-            position ++;
-            if(position > mediaItems.size()-1){
+            position++;
+            if (position > mediaItems.size() - 1) {
                 position = 0;
             }
         }
@@ -463,19 +475,19 @@ public class MusicPlayService extends Service {
         int playmode = getPlaymode();
 
         if (playmode == MusicPlayService.REPEAT_NORMAL) {
-            if(position >= 0){
+            if (position >= 0) {
                 //合法范围
                 openAudio(position);
 
-            }else{
+            } else {
                 //变为合法
                 position = 0;
             }
         } else if (playmode == MusicPlayService.REPEAT_SINGLE) {
-            if(position >=0 ){
+            if (position >= 0) {
                 //合法范围
                 openAudio(position);
-            }else{
+            } else {
                 //变为合法
                 position = 0;
             }
@@ -490,23 +502,24 @@ public class MusicPlayService extends Service {
 
         if (playmode == MusicPlayService.REPEAT_NORMAL) {
             //还没有越界处理
-            position --;
+            position--;
         } else if (playmode == MusicPlayService.REPEAT_SINGLE) {
-            if(!isCompletion){
-                position --;
+            if (!isCompletion) {
+                position--;
             }
 
         } else if (playmode == MusicPlayService.REPEAT_ALL) {
             //合法的位置
-            position --;
-            if(position < 0){
-                position = mediaItems.size()-1;
+            position--;
+            if (position < 0) {
+                position = mediaItems.size() - 1;
             }
         }
     }
 
     /**
      * 得到播放模式
+     *
      * @return
      */
     public int getPlaymode() {
@@ -515,10 +528,11 @@ public class MusicPlayService extends Service {
 
     /**
      * 设置播放模式
+     *
      * @param playmode
      */
     public void setPlaymode(int playmode) {
         this.playmode = playmode;
-        sp.edit().putInt("playmode",playmode).commit();
+        sp.edit().putInt("playmode", playmode).commit();
     }
 }

@@ -80,7 +80,9 @@ public class NetVideoAdapter extends BaseAdapter {
        // x.image().bind(viewHolder.iv_icon, trailersBean.getCoverImg(),imageOptions);
         Picasso.with(context)
                 .load(trailersBean.getCoverImg())
+                //设置正在加载显示的图片
                 .placeholder(R.drawable.video_default)
+                //加载出错显示的图片
                 .error(R.drawable.video_default)
                 .into(viewHolder.iv_icon);
 
