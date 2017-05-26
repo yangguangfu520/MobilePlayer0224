@@ -64,19 +64,19 @@ public class LyricShowView extends TextView {
         //设置居中
         paintWhite.setTextAlign(Paint.Align.CENTER);
 
-        //准备歌词
-        lyrics = new ArrayList<>();
-        Lyric lyric = new Lyric();
-        for (int i = 0; i < 10000; i++) {
-            //不同歌词
-            lyric.setContent("aaaaaaaaaaaa_" + i);
-            lyric.setSleepTime(2000);
-            lyric.setTimePoint(2000 * i);
-            //添加到集合
-            lyrics.add(lyric);
-            //重新创建新对象
-            lyric = new Lyric();
-        }
+//        //准备歌词
+//        lyrics = new ArrayList<>();
+//        Lyric lyric = new Lyric();
+//        for (int i = 0; i < 10000; i++) {
+//            //不同歌词
+//            lyric.setContent("aaaaaaaaaaaa_" + i);
+//            lyric.setSleepTime(2000);
+//            lyric.setTimePoint(2000 * i);
+//            //添加到集合
+//            lyrics.add(lyric);
+//            //重新创建新对象
+//            lyric = new Lyric();
+//        }
 
 //        for (int i = 0; i < 10000; i++) {
 //            Lyric lyric = new Lyric();
@@ -174,6 +174,11 @@ public class LyricShowView extends TextView {
         //什么方法导致onDraw
         invalidate();
 
+
+    }
+
+    public void setLyrics(ArrayList<Lyric> lyrics) {
+        this.lyrics = lyrics;
 
     }
 }
