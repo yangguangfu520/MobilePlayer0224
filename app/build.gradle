@@ -32,4 +32,6 @@ dependencies {
     compile 'com.cjj.materialrefeshlayout:library:1.3.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'org.greenrobot:eventbus:3.0.0'
+    compile files('libs/Msc.jar')
+    compile files('libs/Sunflower.jar')
 }
