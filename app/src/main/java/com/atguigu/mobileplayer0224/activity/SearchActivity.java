@@ -12,7 +12,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.atguigu.mobileplayer0224.R;
+import com.atguigu.mobileplayer0224.adapter.SearchAdapter;
+import com.atguigu.mobileplayer0224.domain.SearchBean;
 import com.atguigu.mobileplayer0224.utils.JsonParser;
+import com.google.gson.Gson;
 import com.iflytek.cloud.ErrorCode;
 import com.iflytek.cloud.InitListener;
 import com.iflytek.cloud.RecognizerResult;
@@ -29,16 +32,19 @@ import org.xutils.x;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 public class SearchActivity extends AppCompatActivity implements View.OnClickListener {
     private EditText etSousuo;
     private ImageView ivVoice;
     private TextView tvGo;
     private ListView lv;
+    private SearchAdapter adapter;
     // 用HashMap存储听写结果
     private HashMap<String, String> mIatResults = new LinkedHashMap<String, String>();
     public static final String NET_SEARCH_URL = "http://hot.news.cntv.cn/index.php?controller=list&action=searchList&sort=date&n=20&wd=";
     private String url;
+    private List<SearchBean.ItemsBean> datas;
 
 
     /**
@@ -83,30 +89,30 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
 
         //1.得到输入框的内容
         String trim = etSousuo.getText().toString().trim();
-        if(!TextUtils.isEmpty(trim)){
+        if (!TextUtils.isEmpty(trim)) {
             //2.拼接
-            url =  NET_SEARCH_URL+trim;
+            url = NET_SEARCH_URL + trim;
             //3.联网请求
             getDataFromNet(url);
-        }else {
+        } else {
             Toast.makeText(SearchActivity.this, "请输入您要搜索的内容", Toast.LENGTH_SHORT).show();
         }
-
 
 
     }
 
     private void getDataFromNet(String url) {
-        RequestParams request = new RequestParams(url);
+        final RequestParams request = new RequestParams(url);
         x.http().get(request, new Callback.CommonCallback<String>() {
             @Override
             public void onSuccess(String result) {
-                Log.e("TAG","请求成功-result=="+result);
+                Log.e("TAG", "请求成功-result==" + result);
+                processData(result);
             }
 
             @Override
             public void onError(Throwable ex, boolean isOnCallback) {
-                Log.e("TAG","请求失败=="+ex.getMessage());
+                Log.e("TAG", "请求失败==" + ex.getMessage());
             }
 
             @Override
@@ -121,6 +127,15 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         });
     }
 
+    private void processData(String json) {
+        SearchBean searchBean = new Gson().fromJson(json, SearchBean.class);
+        datas = searchBean.getItems();
+        if(datas != null && datas.size() >0){
+            adapter = new SearchAdapter(this,datas);
+            lv.setAdapter(adapter);
+        }
+
+    }
     private void showVoiceDialog() {
         //1.创建RecognizerDialog对象
         RecognizerDialog mDialog = new RecognizerDialog(this, new MyInitListener());
@@ -186,7 +201,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
             resultBuffer.append(mIatResults.get(key));
         }
         String stri = resultBuffer.toString();
-        stri = stri.replace("。","");
+        stri = stri.replace("。", "");
 
         etSousuo.setText(stri);
         etSousuo.setSelection(etSousuo.length());
