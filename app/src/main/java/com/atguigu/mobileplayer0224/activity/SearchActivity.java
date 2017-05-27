@@ -2,6 +2,7 @@ package com.atguigu.mobileplayer0224.activity;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -22,6 +23,9 @@ import com.iflytek.cloud.ui.RecognizerDialogListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.xutils.common.Callback;
+import org.xutils.http.RequestParams;
+import org.xutils.x;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -33,6 +37,9 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     private ListView lv;
     // 用HashMap存储听写结果
     private HashMap<String, String> mIatResults = new LinkedHashMap<String, String>();
+    public static final String NET_SEARCH_URL = "http://hot.news.cntv.cn/index.php?controller=list&action=searchList&sort=date&n=20&wd=";
+    private String url;
+
 
     /**
      * Find the Views in the layout<br />
@@ -67,8 +74,51 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                 showVoiceDialog();
                 break;
             case R.id.tv_go:
+                toSearch();
                 break;
         }
+    }
+
+    private void toSearch() {
+
+        //1.得到输入框的内容
+        String trim = etSousuo.getText().toString().trim();
+        if(!TextUtils.isEmpty(trim)){
+            //2.拼接
+            url =  NET_SEARCH_URL+trim;
+            //3.联网请求
+            getDataFromNet(url);
+        }else {
+            Toast.makeText(SearchActivity.this, "请输入您要搜索的内容", Toast.LENGTH_SHORT).show();
+        }
+
+
+
+    }
+
+    private void getDataFromNet(String url) {
+        RequestParams request = new RequestParams(url);
+        x.http().get(request, new Callback.CommonCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                Log.e("TAG","请求成功-result=="+result);
+            }
+
+            @Override
+            public void onError(Throwable ex, boolean isOnCallback) {
+                Log.e("TAG","请求失败=="+ex.getMessage());
+            }
+
+            @Override
+            public void onCancelled(CancelledException cex) {
+
+            }
+
+            @Override
+            public void onFinished() {
+
+            }
+        });
     }
 
     private void showVoiceDialog() {
@@ -88,19 +138,19 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         mDialog.show();
     }
 
-    class MyRecognizerDialogListener implements RecognizerDialogListener{
+    class MyRecognizerDialogListener implements RecognizerDialogListener {
 
         @Override
         public void onResult(RecognizerResult recognizerResult, boolean b) {
             String resultString = recognizerResult.getResultString();
-            Log.e("TAG","onResult--resultString=="+resultString);
+            Log.e("TAG", "onResult--resultString==" + resultString);
             printResult(recognizerResult);
 
         }
 
         @Override
         public void onError(SpeechError speechError) {
-            Log.e("TAG","onError=="+speechError.getMessage());
+            Log.e("TAG", "onError==" + speechError.getMessage());
 
         }
     }
@@ -109,7 +159,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
 
         @Override
         public void onInit(int i) {
-            Log.e("TAG","onInit==i="+i);
+            Log.e("TAG", "onInit==i=" + i);
             if (i == ErrorCode.SUCCESS) {
                 Toast.makeText(SearchActivity.this, "初始化成功", Toast.LENGTH_SHORT).show();
             }
@@ -135,8 +185,10 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         for (String key : mIatResults.keySet()) {
             resultBuffer.append(mIatResults.get(key));
         }
+        String stri = resultBuffer.toString();
+        stri = stri.replace("。","");
 
-        etSousuo.setText(resultBuffer.toString());
+        etSousuo.setText(stri);
         etSousuo.setSelection(etSousuo.length());
     }
 }
