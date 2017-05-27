@@ -365,6 +365,7 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
 
             //2.传入解析歌词的工具类
             ArrayList<Lyric> lyrics = lyricsUtils.getLyrics();
+            //设置到歌词显示控件上
             lyric_show_view.setLyrics(lyrics);
 
             //3.如果有歌词，就歌词同步
