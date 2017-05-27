@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.drawable.AnimationDrawable;
+import android.media.audiofx.Visualizer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -30,6 +31,7 @@ import com.atguigu.mobileplayer0224.domain.MediaItem;
 import com.atguigu.mobileplayer0224.service.MusicPlayService;
 import com.atguigu.mobileplayer0224.utils.LyricsUtils;
 import com.atguigu.mobileplayer0224.utils.Utils;
+import com.atguigu.mobileplayer0224.view.BaseVisualizerView;
 import com.atguigu.mobileplayer0224.view.LyricShowView;
 
 import org.greenrobot.eventbus.EventBus;
@@ -68,6 +70,8 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
 
     private boolean notification;
     private LyricShowView lyric_show_view;
+    private BaseVisualizerView visualizerview;
+    private Visualizer mVisualizer;
 
     private Handler handler = new Handler() {
         @Override
@@ -180,6 +184,7 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
         btnNext = (Button) findViewById(R.id.btn_next);
         btnLyric = (Button) findViewById(R.id.btn_lyric);
         lyric_show_view = (LyricShowView) findViewById(R.id.lyric_show_view);
+        visualizerview = (BaseVisualizerView) findViewById(R.id.visualizerview);
 
         btnPlaymode.setOnClickListener(this);
         btnPre.setOnClickListener(this);
@@ -350,15 +355,14 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
             seekbarAudio.setMax(duration);
 
 
-
             //解析歌词
             //1.得到歌词所在路径
             String audioPath = service.getAudioPath();//mnt/sdcard/audio/beijingbeijing.mp3
 
-            String lyricPath = audioPath.substring(0,audioPath.lastIndexOf("."));//mnt/sdcard/audio/beijingbeijing
-            File file = new File(lyricPath+".lrc");
-            if(!file.exists()){
-                file = new File(lyricPath+".txt");
+            String lyricPath = audioPath.substring(0, audioPath.lastIndexOf("."));//mnt/sdcard/audio/beijingbeijing
+            File file = new File(lyricPath + ".lrc");
+            if (!file.exists()) {
+                file = new File(lyricPath + ".txt");
             }
             LyricsUtils lyricsUtils = new LyricsUtils();
             lyricsUtils.readFile(file);
@@ -370,12 +374,9 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
 
             //3.如果有歌词，就歌词同步
 
-            if(lyricsUtils.isLyric()){
+            if (lyricsUtils.isLyric()) {
                 handler.sendEmptyMessage(SHOW_LYRIC);
             }
-
-
-
 
 
         } catch (RemoteException e) {
@@ -384,9 +385,31 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
         //发消息更新进度
         handler.sendEmptyMessage(PROGRESS);
 
+        //显示音乐频谱
+        setupVisualizerFxAndUi();
 
 
+    }
 
+
+    /**
+     * 生成一个VisualizerView对象，使音频频谱的波段能够反映到 VisualizerView上
+     */
+    private void setupVisualizerFxAndUi() {
+
+        int audioSessionid = 0;
+        try {
+            audioSessionid = service.getAudioSessionId();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        System.out.println("audioSessionid==" + audioSessionid);
+        mVisualizer = new Visualizer(audioSessionid);
+        // 参数内必须是2的位数
+        mVisualizer.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
+        // 设置允许波形表示，并且捕获它
+        visualizerview.setVisualizer(mVisualizer);
+        mVisualizer.setEnabled(true);
     }
 
     private void getData() {
@@ -395,6 +418,14 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
             position = getIntent().getIntExtra("position", 0);
         }
 
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (isFinishing()) {
+            mVisualizer.release();
+        }
     }
 
     @Override
@@ -414,7 +445,7 @@ public class AudioPlayerActivity extends AppCompatActivity implements View.OnCli
         //2.取消注册EventBus
         EventBus.getDefault().unregister(this);
 
-        if(handler != null){
+        if (handler != null) {
             handler.removeCallbacksAndMessages(null);
         }
         super.onDestroy();
