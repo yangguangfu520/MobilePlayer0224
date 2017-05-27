@@ -1,6 +1,7 @@
 package com.atguigu.mobileplayer0224.view;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.atguigu.mobileplayer0224.R;
+import com.atguigu.mobileplayer0224.activity.SearchActivity;
 
 /**
  * 作者：杨光福 on 2017/5/19 10:55
@@ -45,7 +47,9 @@ public class Titlebar extends LinearLayout implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.tv_sousuo:
-                Toast.makeText(context, "搜索", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(context, "搜索", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(context,SearchActivity.class);
+                context.startActivity(intent);
                 break;
             case R.id.rl_game:
                 Toast.makeText(context, "游戏", Toast.LENGTH_SHORT).show();

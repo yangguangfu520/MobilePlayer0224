@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" ></uses-permission>
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
         android:name=".app.MyApplication"
@@ -284,15 +284,17 @@
             android:launchMode="singleTask"
             android:screenOrientation="landscape"
             android:theme="@style/noAnimation_Theme" />
-        <activity android:name=".activity.AudioPlayerActivity"
-            android:launchMode="singleTask"
-            ></activity>
+        <activity
+            android:name=".activity.AudioPlayerActivity"
+            android:launchMode="singleTask" />
 
         <service android:name=".service.MusicPlayService">
-            <intent-filter >
-                <action android:name="com.atguigu.mobileplayer0224.service.MUSICPLAYSERVICE"/>
+            <intent-filter>
+                <action android:name="com.atguigu.mobileplayer0224.service.MUSICPLAYSERVICE" />
             </intent-filter>
         </service>
+
+        <activity android:name=".activity.SearchActivity"></activity>
     </application>
 
 </manifest>
