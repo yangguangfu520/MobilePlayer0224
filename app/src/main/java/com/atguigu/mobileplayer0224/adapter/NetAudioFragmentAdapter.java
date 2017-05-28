@@ -12,6 +12,7 @@ import com.atguigu.mobileplayer0224.R;
 import com.atguigu.mobileplayer0224.domain.NetAudioBean;
 import com.atguigu.mobileplayer0224.utils.Utils;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import org.xutils.x;
 
@@ -154,7 +155,7 @@ public class NetAudioFragmentAdapter extends BaseAdapter {
                     imageHolder = (ImageHolder) convertView.getTag();
                 }
                 //设置数据
-//                imageHolder.setData(mediaItem);
+                imageHolder.setData(mediaItem);
                 break;
             case TYPE_TEXT://文字
 
@@ -311,9 +312,29 @@ public class NetAudioFragmentAdapter extends BaseAdapter {
 
     }
 
-    class ImageHolder {
+    class ImageHolder extends BaseViewHolder {
+        TextView tvContext;
+        ImageView ivImageIcon;
 
-        public ImageHolder(View convertView) {
+        ImageHolder(View convertView) {
+            super(convertView);//调用父类
+            //中间公共部分 -所有的都有
+            tvContext = (TextView) convertView.findViewById(R.id.tv_context);
+            ivImageIcon = (ImageView) convertView.findViewById(R.id.iv_image_icon);
+
+        }
+
+        public void setData(NetAudioBean.ListBean mediaItem) {
+            super.setData(mediaItem);
+            //设置文本-所有的都有
+            tvContext.setText(mediaItem.getText() + "_" + mediaItem.getType());
+            //图片特有的
+
+            ivImageIcon.setImageResource(R.drawable.bg_item);
+            if (mediaItem.getImage() != null && mediaItem.getImage() != null && mediaItem.getImage().getSmall() != null) {
+                Glide.with(mContext).load(mediaItem.getImage().getDownload_url().get(0)).placeholder(R.drawable.bg_item).error(R.drawable.bg_item).diskCacheStrategy(DiskCacheStrategy.ALL).into(ivImageIcon);
+            }
+
 
         }
     }
