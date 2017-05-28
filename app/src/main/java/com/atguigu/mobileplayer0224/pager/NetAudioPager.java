@@ -1,12 +1,15 @@
 package com.atguigu.mobileplayer0224.pager;
 
+import android.content.Intent;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.atguigu.mobileplayer0224.R;
+import com.atguigu.mobileplayer0224.activity.ShowImageAndGifActivity;
 import com.atguigu.mobileplayer0224.adapter.NetAudioFragmentAdapter;
 import com.atguigu.mobileplayer0224.domain.NetAudioBean;
 import com.atguigu.mobileplayer0224.fragment.BaseFragment;
@@ -48,6 +51,32 @@ public class NetAudioPager extends BaseFragment {
         Log.e("TAG", "NetAudioPager-initView");
         View view = View.inflate(context, R.layout.pager_net_audio, null);
         ButterKnife.bind(this, view);
+
+        //设置点击事件
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+
+                NetAudioBean.ListBean listEntity = myAdapter.getItem(position);
+                if(listEntity !=null ){
+                    //3.传递视频列表
+                    Intent intent = new Intent(context,ShowImageAndGifActivity.class);
+                    if(listEntity.getType().equals("gif")){
+                        String url = listEntity.getGif().getImages().get(0);
+                        intent.putExtra("url",url);
+                        context.startActivity(intent);
+                    }else if(listEntity.getType().equals("image")){
+                        String url = listEntity.getImage().getBig().get(0);
+                        intent.putExtra("url",url);
+                        context.startActivity(intent);
+                    }
+                }
+
+
+            }
+        });
+
         return view;
     }
 

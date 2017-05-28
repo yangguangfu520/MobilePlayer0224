@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -111,8 +112,8 @@ public class NetAudioFragmentAdapter extends BaseAdapter {
     }
 
     @Override
-    public Object getItem(int position) {
-        return null;
+    public NetAudioBean.ListBean getItem(int position) {
+        return datas.get(position);
     }
 
     @Override
@@ -398,9 +399,15 @@ public class NetAudioFragmentAdapter extends BaseAdapter {
     }
 
     class ADHolder{
+        TextView tvContext;
+        ImageView ivImageIcon;
+        Button btnInstall;
 
-        public ADHolder(View convertView) {
-
+        ADHolder(View convertView) {
+            //中间公共部分 -所有的都有
+            tvContext = (TextView) convertView.findViewById(R.id.tv_context);
+            btnInstall = (Button) convertView.findViewById(R.id.btn_install);
+            ivImageIcon = (ImageView) convertView.findViewById(R.id.iv_image_icon);
         }
     }
 
