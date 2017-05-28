@@ -34,4 +34,5 @@ dependencies {
     compile 'org.greenrobot:eventbus:3.0.0'
     compile files('libs/Msc.jar')
     compile files('libs/Sunflower.jar')
+    compile 'com.jakewharton:butterknife:7.0.1'
 }
