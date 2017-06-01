@@ -71,6 +71,17 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
     }
 
+    public void addData(int position, String data) {
+        datas.add(position,data);
+        notifyItemInserted(position);//更新数据
+    }
+
+    public void remove(int position) {
+        datas.remove(position);
+        //刷新
+        notifyItemRemoved(position);
+    }
+
 
     //必须的
     class MyViewHolder extends RecyclerView.ViewHolder {

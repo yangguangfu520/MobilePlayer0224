@@ -2,6 +2,7 @@ package com.atguigu.recyclerviewdemo;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -49,6 +50,9 @@ public class MainActivity extends AppCompatActivity {
         //添加分割线
         recyclerview.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL_LIST));
 
+        //设置动画
+        recyclerview.setItemAnimator(new DefaultItemAnimator());
+
         //设置item的点击事件
         adapter.setOnItemClickListener(new MyAdapter.OnItemClickListener() {
             @Override
@@ -71,18 +75,23 @@ public class MainActivity extends AppCompatActivity {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_add:
-                Toast.makeText(MainActivity.this, "添加", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MainActivity.this, "添加", Toast.LENGTH_SHORT).show();
+                adapter.addData(0,"我是第0条数据");
+                //定位到第0条
+                recyclerview.scrollToPosition(0);
+
                 break;
             case R.id.btn_remove:
-                Toast.makeText(MainActivity.this, "移除", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MainActivity.this, "移除", Toast.LENGTH_SHORT).show();
+                adapter.remove(0);
                 break;
             case R.id.btn_list:
-                Toast.makeText(MainActivity.this, "List", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MainActivity.this, "List", Toast.LENGTH_SHORT).show();
 
                 recyclerview.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false));
                 break;
             case R.id.btn_grid:
-                Toast.makeText(MainActivity.this, "Grid", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MainActivity.this, "Grid", Toast.LENGTH_SHORT).show();
                 recyclerview.setLayoutManager(new GridLayoutManager(this, 3,GridLayoutManager.VERTICAL,false));
                 break;
         }
