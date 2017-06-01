@@ -335,7 +335,10 @@ public class NetAudioFragmentAdapter extends BaseAdapter {
 
             ivImageIcon.setImageResource(R.drawable.bg_item);
             if (mediaItem.getImage() != null && mediaItem.getImage() != null && mediaItem.getImage().getSmall() != null) {
-                Glide.with(mContext).load(mediaItem.getImage().getDownload_url().get(0)).placeholder(R.drawable.bg_item).error(R.drawable.bg_item).diskCacheStrategy(DiskCacheStrategy.ALL).into(ivImageIcon);
+                Glide.with(mContext).load(mediaItem.getImage().getDownload_url().get(0))
+                        .placeholder(R.drawable.bg_item).
+                        error(R.drawable.bg_item).
+                        diskCacheStrategy(DiskCacheStrategy.ALL).into(ivImageIcon);
             }
 
 
