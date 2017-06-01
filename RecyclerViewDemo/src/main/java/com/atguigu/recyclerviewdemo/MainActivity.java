@@ -46,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
         recyclerview.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false));
 //        recyclerview.setLayoutManager(new GridLayoutManager(this, 3,GridLayoutManager.HORIZONTAL,false));
 //        recyclerview.setLayoutManager(new StaggeredGridLayoutManager(4,StaggeredGridLayoutManager.VERTICAL));
+        //添加分割线
+        recyclerview.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL_LIST));
 
     }
 
