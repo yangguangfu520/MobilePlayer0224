@@ -19,6 +19,7 @@ import com.atguigu.mobileplayer0224.pager.LocalAudioPager;
 import com.atguigu.mobileplayer0224.pager.LocalVideoPager;
 import com.atguigu.mobileplayer0224.pager.NetAudioPager;
 import com.atguigu.mobileplayer0224.pager.NetVideoPager;
+import com.atguigu.mobileplayer0224.pager.RecyclerViewPager;
 
 import java.util.ArrayList;
 
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
         fragments.add(new LocalAudioPager());
         fragments.add(new NetAudioPager());
         fragments.add(new NetVideoPager());
+        fragments.add(new RecyclerViewPager());
     }
 
     class MyOnCheckedChangeListener implements RadioGroup.OnCheckedChangeListener{
@@ -75,6 +77,9 @@ public class MainActivity extends AppCompatActivity {
 
                 case R.id.rb_net_video:
                     position  = 3;
+                    break;
+                case R.id.rb_recycler_view:
+                    position  = 4;
                     break;
             }
             //根据位置得到对应的Fragment
