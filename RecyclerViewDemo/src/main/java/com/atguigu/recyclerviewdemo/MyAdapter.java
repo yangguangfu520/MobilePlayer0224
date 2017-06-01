@@ -81,8 +81,32 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         public MyViewHolder(View itemView) {
             super(itemView);
             ButterKnife.inject(this,itemView);
+            //设置item的点击事件
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+//                    Toast.makeText(context, ""+datas.get(getLayoutPosition()), Toast.LENGTH_SHORT).show();
+                    if(listener != null){
+                        listener.onItemClick(getLayoutPosition());
+                    }
+                }
+            });
         }
     }
 
+    private OnItemClickListener listener;
+    /**
+     * 点击某条的监听器
+     */
+    public interface OnItemClickListener{
+        public void onItemClick(int position);
+    }
 
+    /**
+     * 设置点击item的监听
+     * @param listener
+     */
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
 }

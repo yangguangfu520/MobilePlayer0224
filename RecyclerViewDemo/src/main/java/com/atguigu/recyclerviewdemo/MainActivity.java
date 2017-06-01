@@ -49,6 +49,15 @@ public class MainActivity extends AppCompatActivity {
         //添加分割线
         recyclerview.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL_LIST));
 
+        //设置item的点击事件
+        adapter.setOnItemClickListener(new MyAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                String content = datas.get(position);
+                Toast.makeText(MainActivity.this, "content=="+content, Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
     private void initData() {
